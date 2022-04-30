@@ -1,5 +1,0 @@
-C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-core-revit\ASRR.Core.Revit\bin\Debug\ASRR.Core.Revit.dll
-C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-core-revit\ASRR.Core.Revit\bin\Debug\ASRR.Core.Revit.pdb
-C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-core-revit\ASRR.Core.Revit\obj\Debug\ASRR.Core.Revit.csproj.CoreCompileInputs.cache
-C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-core-revit\ASRR.Core.Revit\obj\Debug\ASRR.Core.Revit.dll
-C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-core-revit\ASRR.Core.Revit\obj\Debug\ASRR.Core.Revit.pdb
