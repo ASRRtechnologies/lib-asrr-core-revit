@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure;
 using NLog;
 
 namespace ASRR.Revit.Core.Elements.Placement
@@ -20,9 +21,8 @@ namespace ASRR.Revit.Core.Elements.Placement
         public void Place(Document doc, 
             string familyName,
             string type,
-            Reference reference,
             XYZ location,
-            XYZ referenceDirection)
+            ElementId levelId)
         {
             var symbols = GetFamilySymbol(doc, familyName, type);
 
@@ -37,9 +37,15 @@ namespace ASRR.Revit.Core.Elements.Placement
                 Log.Warn("Found more than one matching symbol, using first symbol found.");
             }
 
+            var level = doc.GetElement(levelId) as Level;
             var symbol = symbols.First();
-            Log.Info($"Creating new placing instance at {location} with direction {referenceDirection}");
-            doc.Create.NewFamilyInstance(reference, location, referenceDirection, symbol);
+            Log.Info($"Found matching symbol '{symbol.Name}'");
+
+            using (var transaction = new Transaction(doc)) {
+                transaction.Start("Place family instance");
+                Log.Info($"Creating new placing instance at {location} on level {level.Elevation}");
+                doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+            }
         }
 
         public List<FamilySymbol> GetFamilySymbol(Document doc, string familyName, string typeName)
