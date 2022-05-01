@@ -7,8 +7,8 @@
     <ProjectGuid>{60AC09BD-DB0E-40A9-B8A7-B0D40E7042E6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ASRR.Core.Revit</RootNamespace>
-    <AssemblyName>ASRR.Core.Revit</AssemblyName>
+    <RootNamespace>ASRR.Revit.Core</RootNamespace>
+    <AssemblyName>ASRR.Revit.Core</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

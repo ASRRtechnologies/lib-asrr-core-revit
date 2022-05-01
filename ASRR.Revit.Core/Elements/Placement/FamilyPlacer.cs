@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 
-namespace ASRR.Core.Revit.Elements.Placement
+namespace ASRR.Revit.Core.Elements.Placement
 {
     public class FamilyPlacer
     {
