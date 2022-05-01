@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ASRR.Revit.Core.Elements.Rotation;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using NLog;
@@ -22,7 +23,8 @@ namespace ASRR.Revit.Core.Elements.Placement
             string familyName,
             string type,
             XYZ location,
-            ElementId levelId)
+            ElementId levelId,
+            double rotation)
         {
             var symbols = GetFamilySymbol(doc, familyName, type);
 
@@ -43,8 +45,10 @@ namespace ASRR.Revit.Core.Elements.Placement
 
             using (var transaction = new Transaction(doc)) {
                 transaction.Start("Place family instance");
-                Log.Info($"Creating new placing instance at {location} on level {level.Elevation}");
-                doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                var newFamilyInstance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                Log.Info($"Placed new family instance at {location} on level {level.Elevation}, id is '{newFamilyInstance.Id}'");
+                ElementRotator.RotateElement(newFamilyInstance, rotation);
+                transaction.Commit();
             }
         }
 
