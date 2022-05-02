@@ -55,6 +55,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Elements\Parameters\Dto\BaseRevitParameter.cs" />
+    <Compile Include="Elements\Parameters\Dto\RevitParameter.cs" />
+    <Compile Include="Elements\Parameters\ParameterApplier.cs" />
     <Compile Include="Elements\Placement\CoordinateUtilities.cs" />
     <Compile Include="Elements\Placement\FamilyPlacer.cs" />
     <Compile Include="Elements\Rotation\ElementRotator.cs" />
@@ -63,5 +66,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

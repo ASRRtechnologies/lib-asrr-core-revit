@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ASRR.Revit.Core.Elements.Parameters;
 using ASRR.Revit.Core.Elements.Rotation;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
@@ -19,12 +20,12 @@ namespace ASRR.Revit.Core.Elements.Placement
         /// <summary>
         /// This method places a family based on reference plane, location and referenceDirection
         /// </summary>
-        public void Place(Document doc, 
+        public void Place(Document doc,
             string familyName,
             string type,
             XYZ location,
             ElementId levelId,
-            double rotation)
+            double rotation, bool mirrored, Dictionary<string, object> parameters)
         {
             var symbols = GetFamilySymbol(doc, familyName, type);
 
@@ -34,7 +35,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 return;
             }
 
-            if (symbols.Count() > 1)
+            if (symbols.Count > 1)
             {
                 Log.Warn("Found more than one matching symbol, using first symbol found.");
             }
@@ -46,8 +47,27 @@ namespace ASRR.Revit.Core.Elements.Placement
             using (var transaction = new Transaction(doc)) {
                 transaction.Start("Place family instance");
                 var newFamilyInstance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
-                Log.Info($"Placed new family instance at {location} on level {level.Elevation}, id is '{newFamilyInstance.Id}'");
-                ElementRotator.RotateElement(newFamilyInstance, rotation);
+                Log.Info($"Placed new family instance at {location} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
+
+                if (rotation != 0.0)
+                {
+                    Log.Info($"Rotating element {rotation} degrees");
+                    ElementRotator.RotateElement(newFamilyInstance, rotation);
+                }
+
+                if (mirrored)
+                {
+                    Log.Info($"Mirroring element");
+
+                    // ElementTransformUtils.MirrorElement(doc, newFamilyInstance.Id, plane);
+                }
+
+                if (parameters.Count > 0)
+                {
+                    Log.Info("Applying params");
+                    ParameterUtils.Apply(newFamilyInstance, parameters);
+                }
+
                 transaction.Commit();
             }
         }
@@ -59,7 +79,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 return new FilteredElementCollector(doc)
                     .OfClass(typeof(FamilySymbol))
                     .Cast<FamilySymbol>()
-                    .Where(x => x.Family.Name.Equals(familyName)) // family
+                    // .Where(x => x.Family.Name.Equals(familyName)) // family TODO ik denk dat dit niet nodig is als type uniek is
                     .Where(x => x.Name.Equals(typeName))
                     .ToList(); // family type         
             }
