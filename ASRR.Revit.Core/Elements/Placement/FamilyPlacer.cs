@@ -34,6 +34,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 transaction.Start("Place family instance");
                 var newFamilyInstance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
                 Log.Info($"Placed new family instance at {location} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
+                XYZ instanceLocation = ((LocationPoint)newFamilyInstance.Location).Point;
 
                 if (rotation != 0.0)
                 {
@@ -44,8 +45,10 @@ namespace ASRR.Revit.Core.Elements.Placement
                 if (mirrored)
                 {
                     Log.Info($"Mirroring element");
-
-                    // ElementTransformUtils.MirrorElement(doc, newFamilyInstance.Id, plane);
+                    using (Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, instanceLocation)) // ZX
+                    {
+                        ElementTransformUtils.MirrorElements(doc, new []{newFamilyInstance.Id}, plane, false);
+                    }
                 }
 
                 if (parameters.Count > 0)
