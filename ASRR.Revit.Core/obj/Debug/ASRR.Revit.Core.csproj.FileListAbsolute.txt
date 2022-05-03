@@ -1,0 +1,11 @@
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\bin\Debug\ASRR.Revit.Core.dll
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\bin\Debug\ASRR.Revit.Core.pdb
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\bin\Debug\NLog.dll
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\bin\Debug\RevitAPI.dll
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\bin\Debug\RevitAPIUI.dll
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\bin\Debug\NLog.xml
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\obj\Debug\ASRR.Revit.Core.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\obj\Debug\ASRR.Revit.Core.csproj.CopyComplete
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\obj\Debug\ASRR.Revit.Core.dll
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\obj\Debug\ASRR.Revit.Core.pdb
+C:\Users\Administrator\source\repos\BouwDeck.Revit.Tools\lib\lib-asrr-revit-core\ASRR.Revit.Core\obj\Debug\ASRR.Revit.Core.csproj.AssemblyReference.cache
