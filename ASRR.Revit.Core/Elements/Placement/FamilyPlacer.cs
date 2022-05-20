@@ -47,14 +47,14 @@ namespace ASRR.Revit.Core.Elements.Placement
                     Log.Info($"Mirroring element");
                     using (Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, instanceLocation)) // ZX
                     {
-                        ElementTransformUtils.MirrorElements(doc, new []{newFamilyInstance.Id}, plane, false);
+                        ElementTransformUtils.MirrorElements(doc, new[]{newFamilyInstance.Id}, plane, false);
                     }
                 }
 
                 if (parameters.Count > 0)
                 {
                     Log.Info("Applying params");
-                    ParameterUtils.Apply(newFamilyInstance, parameters);
+                    ParameterUtils.Apply(newFamilyInstance, parameters, true);
                 }
 
                 transaction.Commit();

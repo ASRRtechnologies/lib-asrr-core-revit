@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ASRR.Revit.Core.Elements.Parameters.Dto;
+using ASRR.Revit.Core.Elements.Placement;
 using Autodesk.Revit.UI;
 using NLog;
 
@@ -17,7 +18,7 @@ namespace ASRR.Revit.Core.Elements.Parameters
         /// <summary>
         /// This method applies a set of parameters to a specific element. Should be called inside a Revit transaction.
         /// </summary>
-        public static bool Apply(Element element, Dictionary<string, object> parameters)
+        public static bool Apply(Element element, Dictionary<string, object> parameters, bool convert = false)
         {
             if (parameters.Count > 1)
             {
@@ -44,6 +45,7 @@ namespace ASRR.Revit.Core.Elements.Parameters
                         parameter.Set(s);
                         return true;
                     case double d:
+                        if (convert) d = CoordinateUtilities.ConvertMmToFeet(d);
                         parameter.Set(d);
                         return true;
                     case int i:
