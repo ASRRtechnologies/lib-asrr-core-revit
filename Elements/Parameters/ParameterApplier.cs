@@ -20,11 +20,13 @@ namespace ASRR.Revit.Core.Elements.Parameters
         /// </summary>
         public static bool Apply(Element element, Dictionary<string, object> parameters, bool convert = false)
         {
-            if (parameters.Count > 1)
+            if (parameters.Count == 0)
             {
                 Log.Info("No parameters to be set");
                 return true;
             }
+
+            Log.Info("Setting {} params", parameters.Count);
 
             foreach (var keyValuePair in parameters)
             {
@@ -43,21 +45,21 @@ namespace ASRR.Revit.Core.Elements.Parameters
                 {
                     case string s:
                         parameter.Set(s);
-                        return true;
+                        break;
                     case double d:
                         if (convert) d = CoordinateUtilities.ConvertMmToFeet(d);
                         parameter.Set(d);
-                        return true;
+                        break;
                     case int i:
                         parameter.Set(i);
-                        return true;
+                        break;
                     default:
                         Log.Error($"Invalid parameter type for key '{key}'");
-                        break;
+                        return false;
                 }
             }
 
-            return false;
+            return true;
         }
     }
 }
