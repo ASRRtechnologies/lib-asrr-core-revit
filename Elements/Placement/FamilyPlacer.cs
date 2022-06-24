@@ -1,0 +1,113 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ASRR.Revit.Core.Elements.Rotation;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure;
+using NLog;
+using ParameterUtils = ASRR.Revit.Core.Elements.Parameters.ParameterUtils;
+
+namespace ASRR.Revit.Core.Elements.Placement
+{
+    
+    /// <summary>
+    /// Class to interact with families
+    /// </summary>
+    public class FamilyPlacer
+    {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// This method places a family based on reference plane, location and referenceDirection
+        /// </summary>
+        public void Place(Document doc,
+            XYZ location,
+            ElementId levelId,
+            FamilySymbol symbol,
+            double rotation, 
+            bool mirrored, 
+            Dictionary<string, object> parameters)
+        {
+            var level = doc.GetElement(levelId) as Level;
+
+            using (var transaction = new Transaction(doc)) {
+                transaction.Start("Place family instance");
+                var newFamilyInstance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                Log.Info($"Placed new family instance at {location} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
+                XYZ instanceLocation = ((LocationPoint)newFamilyInstance.Location).Point;
+
+                if (rotation != 0.0)
+                {
+                    Log.Info($"Rotating element {rotation} degrees");
+                    ElementRotator.RotateElement(newFamilyInstance, rotation);
+                }
+
+                if (mirrored)
+                {
+                    Log.Info($"Mirroring element");
+                    using (Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, instanceLocation)) // ZX
+                    {
+                        ElementTransformUtils.MirrorElements(doc, new[]{newFamilyInstance.Id}, plane, false);
+                    }
+                }
+
+                if (parameters.Count > 0)
+                {
+                    Log.Info("Applying params");
+                    ParameterUtils.Apply(newFamilyInstance, parameters, true);
+                }
+
+                transaction.Commit();
+            }
+        }
+
+        public List<FamilySymbol> GetFamilySymbol(Document doc, string typeName)
+        {
+            try
+            {
+                return new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilySymbol))
+                    .Cast<FamilySymbol>()
+                    // .Where(x => x.Family.Name.Equals(familyName)) // family TODO ik denk dat dit niet nodig is als type uniek is
+                    .Where(x => x.Name.Equals(typeName))
+                    .ToList(); // family type         
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+        
+        public IEnumerable<FamilyInstance> GetFamilyInstancesByFamilyName(Document doc, string familyName)
+        {
+            try
+            {
+                IEnumerable<FamilyInstance> familyInstances = new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilyInstance))
+                    .Cast<FamilyInstance>()
+                    .Where(x => x.Symbol.Family.Name.Contains(familyName));
+                return familyInstances;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public IEnumerable<FamilyInstance> GetFamilyInstancesByFamilyAndType(Document doc, string familyName, string typeName)
+        {
+            try
+            {
+                return new FilteredElementCollector(doc)
+                    .OfClass(typeof(FamilyInstance))
+                    .Cast<FamilyInstance>()
+                    .Where(x => x.Symbol.Family.Name.Equals(familyName)) // family
+                    .Where(x => x.Name.Equals(typeName)); // family type         
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+    }
+}
