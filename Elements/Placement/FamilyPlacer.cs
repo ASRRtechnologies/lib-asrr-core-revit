@@ -58,7 +58,7 @@ namespace ASRR.Revit.Core.Elements.Placement
 
 
         /// <summary>
-        /// This method places a family based on curve
+        /// This method places a family based on curve (line based elements)
         /// </summary>
         public void Place(Document doc,
             Curve curve,
@@ -98,7 +98,6 @@ namespace ASRR.Revit.Core.Elements.Placement
                 return new FilteredElementCollector(doc)
                     .OfClass(typeof(FamilySymbol))
                     .Cast<FamilySymbol>()
-                    // .Where(x => x.Family.Name.Equals(familyName)) // family TODO ik denk dat dit niet nodig is als type uniek is
                     .Where(x => x.Name.Equals(typeName))
                     .ToList(); // family type         
             }
