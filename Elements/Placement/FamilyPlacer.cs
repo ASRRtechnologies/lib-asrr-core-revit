@@ -78,14 +78,14 @@ namespace ASRR.Revit.Core.Elements.Placement
             {
                 transaction.Start("Place family instance");
                 var newFamilyInstance = doc.Create.NewFamilyInstance(curve, symbol, level, StructuralType.NonStructural);
-                Log.Info($"Placed new family instance at {curve} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
+                Log.Info($"Placed new family instance based on curve {curve.GetEndPoint(0)} {curve.Length} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
                 // XYZ instanceLocation = ((LocationPoint)newFamilyInstance.Location).Point;
 
-                if (rotation != 0.0)
-                {
-                    Log.Info($"Rotating element {rotation} degrees");
-                    ElementRotator.RotateElement(newFamilyInstance, rotation);
-                }
+                // if (rotation != 0.0)
+                // {
+                //     Log.Info($"Rotating element {rotation} degrees");
+                //     ElementRotator.RotateElement(newFamilyInstance, rotation);
+                // }
 
                 // if (mirrored)
                 // {
