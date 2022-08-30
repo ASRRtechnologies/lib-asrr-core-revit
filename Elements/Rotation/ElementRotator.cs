@@ -8,7 +8,7 @@ namespace ASRR.Revit.Core.Elements.Rotation
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-        public static bool RotateElement(Element element, double degrees)
+        public static bool RotateElement(Element element, double degrees, XYZ rotationAxis)
         {
             bool rotated = false;
             // Rotate the element via its location curve.
@@ -17,10 +17,12 @@ namespace ASRR.Revit.Core.Elements.Rotation
             if (null != elementPoint)
             {
                 //Curve line = elementPoint.Point;
-                XYZ aa = elementPoint.Point;
+                XYZ aa = rotationAxis;
                 XYZ cc = new XYZ(aa.X, aa.Y, aa.Z + 10);
                 Line axis = Line.CreateBound(aa, cc);
                 rotated = elementPoint.Rotate(axis, ConvertToRadians(degrees));
+                Log.Info($"Rotated around point {aa.X}, {aa.Y}, {aa.Z}");
+                Log.Info($"C Rotated around point {cc.X}, {cc.Y}, {cc.Z}");
             }
             else
             {
