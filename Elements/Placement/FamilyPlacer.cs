@@ -38,7 +38,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 if (rotation != 0.0)
                 {
                     Log.Info($"Rotating element {rotation} degrees");
-                    ElementRotator.RotateElement(newFamilyInstance, rotation, instanceLocation);
+                    ElementRotator.RotateElement(newFamilyInstance, rotation, location);
                 }
 
                 if (mirrored)
