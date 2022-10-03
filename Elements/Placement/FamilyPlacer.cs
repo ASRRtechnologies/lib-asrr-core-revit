@@ -44,7 +44,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 if (mirrored)
                 {
                     Log.Info($"Mirroring element");
-                    using (Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, instanceLocation)) // ZX
+                    using (Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, location)) // ZX
                     {
                         ElementTransformUtils.MirrorElements(doc, new[]{newFamilyInstance.Id}, plane, false);
                     }
