@@ -1,12 +1,6 @@
 ﻿using Autodesk.Revit.DB;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ASRR.Revit.Core.Elements.Parameters.Dto;
 using ASRR.Revit.Core.Elements.Placement;
-using Autodesk.Revit.UI;
 using NLog;
 
 namespace ASRR.Revit.Core.Elements.Parameters

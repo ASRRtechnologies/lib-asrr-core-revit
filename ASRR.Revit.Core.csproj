@@ -46,17 +46,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Elements\Families\FamilyUtils.cs" />
+    <Compile Include="Elements\GeometryUtils.cs" />
     <Compile Include="Elements\Parameters\Dto\BaseRevitParameter.cs" />
     <Compile Include="Elements\Parameters\Dto\RevitParameter.cs" />
     <Compile Include="Elements\Parameters\ParameterApplier.cs" />
     <Compile Include="Elements\Placement\CoordinateUtilities.cs" />
     <Compile Include="Elements\Placement\FamilyPlacer.cs" />
     <Compile Include="Elements\Rotation\ElementRotator.cs" />
+    <Compile Include="Elements\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NLog">
-      <Version>5.0.4</Version>
+      <Version>5.0.5</Version>
     </PackageReference>
     <PackageReference Include="Revit.RevitApi.x64">
       <Version>2023.0.0</Version>
