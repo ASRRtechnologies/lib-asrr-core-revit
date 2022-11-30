@@ -33,7 +33,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 transaction.Start("Place family instance");
                 var newFamilyInstance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
                 Log.Info($"Placed new family instance at {location} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
-                XYZ instanceLocation = ((LocationPoint)newFamilyInstance.Location).Point;
+                var instanceLocation = ((LocationPoint)newFamilyInstance.Location).Point;
 
                 if (rotation != 0.0)
                 {
@@ -44,7 +44,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 if (mirrored)
                 {
                     Log.Info($"Mirroring element");
-                    using (Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, location)) // ZX
+                    using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, location)) // ZX
                     {
                         ElementTransformUtils.MirrorElements(doc, new[]{newFamilyInstance.Id}, plane, false);
                     }
@@ -79,7 +79,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 if (mirrored)
                 {
                     Log.Info($"Mirroring element");
-                    using (Plane plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, curve.GetEndPoint(0))) // ZX
+                    using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, curve.GetEndPoint(0))) // ZX
                     {
                         ElementTransformUtils.MirrorElements(doc, new[] { newFamilyInstance.Id }, plane, false);
                     }
@@ -111,7 +111,7 @@ namespace ASRR.Revit.Core.Elements.Placement
         {
             try
             {
-                IEnumerable<FamilyInstance> familyInstances = new FilteredElementCollector(doc)
+                var familyInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(FamilyInstance))
                     .Cast<FamilyInstance>()
                     .Where(x => x.Symbol.Family.Name.Contains(familyName));

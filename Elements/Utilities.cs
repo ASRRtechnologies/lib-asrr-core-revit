@@ -12,12 +12,12 @@ namespace ASRR.Revit.Core.Elements
     {
         public static void ZoomToPoint(UIDocument uidoc, XYZ point, float zoom)
         {
-            Document doc = uidoc.Document;
-            View view = doc.ActiveView;
+            var doc = uidoc.Document;
+            var view = doc.ActiveView;
             UIView uiView = null;
 
-            IList<UIView> uiviews = uidoc.GetOpenUIViews();
-            foreach (UIView uv in uiviews)
+            var uiviews = uidoc.GetOpenUIViews();
+            foreach (var uv in uiviews)
             {
                 if (uv.ViewId.Equals(view.Id))
                 {
@@ -29,10 +29,10 @@ namespace ASRR.Revit.Core.Elements
             if (uiView == null)
                 return;
 
-            IList<XYZ> corners = uiView.GetZoomCorners();
-            XYZ bottomLeftCorner = corners[0];
-            XYZ topRightCorner = corners[1];
-            XYZ diagonal = (topRightCorner - bottomLeftCorner).Normalize();
+            var corners = uiView.GetZoomCorners();
+            var bottomLeftCorner = corners[0];
+            var topRightCorner = corners[1];
+            var diagonal = (topRightCorner - bottomLeftCorner).Normalize();
             diagonal *= zoom;
 
             uiView.ZoomAndCenterRectangle(point - diagonal, point + diagonal);
@@ -40,7 +40,8 @@ namespace ASRR.Revit.Core.Elements
 
         public static View3D Get3dView(Document doc)
         {
-            FilteredElementCollector collector = new FilteredElementCollector(doc).OfClass(typeof(View3D));
+            //TODO: zorgen voor altijd een juiste view, bijv voorkeur view met naam '{3D}' 
+            var collector = new FilteredElementCollector(doc).OfClass(typeof(View3D));
 
             foreach (View3D v in collector)
             {
@@ -52,6 +53,8 @@ namespace ASRR.Revit.Core.Elements
             return null;
         }
 
+        
+
         public static IEnumerable<Room> GetRooms(Document doc)
         {
             var elements = GetElementsOfCategory(doc, BuiltInCategory.OST_Rooms);
@@ -60,23 +63,23 @@ namespace ASRR.Revit.Core.Elements
 
         public static ICollection<Element> GetElementsOfCategory(Document doc, BuiltInCategory category)
         {
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            ElementCategoryFilter filter = new ElementCategoryFilter(category);
+            var collector = new FilteredElementCollector(doc);
+            var filter = new ElementCategoryFilter(category);
             return collector.WherePasses(filter).ToElements();
         }
 
         public static ICollection<Element> GetElementsOfCategories(Document doc,
             ICollection<BuiltInCategory> categories)
         {
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
-            ElementMulticategoryFilter filter = new ElementMulticategoryFilter(categories);
+            var collector = new FilteredElementCollector(doc);
+            var filter = new ElementMulticategoryFilter(categories);
             return collector.WherePasses(filter).ToElements();
         }
 
 
         public static bool SetParameter(Element element, string parameterName, int value)
         {
-            Parameter parameter = element.LookupParameter(parameterName);
+            var parameter = element.LookupParameter(parameterName);
             if (parameter != null)
             {
                 try
@@ -113,7 +116,7 @@ namespace ASRR.Revit.Core.Elements
             if (GeometryUtils.IsAlmostEqual(start, end))
                 throw new ArgumentException("Expected two different points.");
 
-            Line line = Line.CreateBound(start, end);
+            var line = Line.CreateBound(start, end);
 
             if (null == line)
             {
@@ -133,7 +136,7 @@ namespace ASRR.Revit.Core.Elements
                 else
                     norm = XYZ.BasisZ;
 
-                Plane plane = Plane.CreateByNormalAndOrigin(norm, start);
+                var plane = Plane.CreateByNormalAndOrigin(norm, start);
 
                 return SketchPlane.Create(doc, plane);
             }
@@ -141,7 +144,7 @@ namespace ASRR.Revit.Core.Elements
 
         public static string CurveToString(Curve curve)
         {
-            string result = "Start: ";
+            var result = "Start: ";
             result += XYZToString(curve.GetEndPoint(0));
             result += "End: ";
             result += XYZToString(curve.GetEndPoint(1));
