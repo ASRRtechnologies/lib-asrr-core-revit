@@ -1,8 +1,7 @@
 ﻿using System;
 using ASRR.Revit.Core.Elements.Placement;
-using ASRR.Revit.Core.Model;
 
-namespace Form.Revit.Common
+namespace ASRR.Revit.Core.Model
 {
     public class RadianRotation : IRotation
     {
