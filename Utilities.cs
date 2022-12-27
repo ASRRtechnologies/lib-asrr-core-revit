@@ -5,11 +5,15 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using Autodesk.Revit.ApplicationServices;
+using System.IO;
+using NLog;
 
 namespace ASRR.Revit.Core.Elements
 {
     public class Utilities
     {
+        private static readonly Logger _log = LogManager.GetCurrentClassLogger();
+
         public static void ZoomToPoint(UIDocument uidoc, XYZ point, float zoom)
         {
             var doc = uidoc.Document;
@@ -160,6 +164,115 @@ namespace ASRR.Revit.Core.Elements
         public static double SquareFootToSquareM(double sqFoot, int decimals = 2)
         {
             return Math.Round(sqFoot * 0.092903, decimals);
+        }
+
+        public static List<T> GetAllOfType<T>(Document doc) where T : class
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            return collector.OfClass(typeof(T)).Select(e => e as T).ToList();
+        }
+
+        public static T GetFirstOfType<T>(Document doc) where T : class
+        {
+            return GetAllOfType<T>(doc).FirstOrDefault() as T;
+        }
+
+        public static T FindElementByName<T>(Document doc, string elementName) where T : class
+        {
+            List<T> allElements = GetAllOfType<T>(doc);
+
+            T element = allElements.FirstOrDefault(e => (e as Element).Name == elementName);
+
+            return element;
+        }
+
+        public static List<T> FindElementsByName<T>(Document doc, IEnumerable<string> elementNames) where T : class
+        {
+            List<T> result = new List<T>();
+
+            if (elementNames == null)
+                return result;
+
+            List<T> allElements = GetAllOfType<T>(doc);
+            foreach (string elementName in elementNames)
+            {
+                T element = allElements.FirstOrDefault(e => (e as Element).Name == elementName);
+                if (element == null)
+                {
+                    _log.Error($"Could not find element with name '{elementName}'");
+                    continue; //Don't add null when element can't be found
+                }
+
+                result.Add(element);
+            }
+
+            return result;
+        }
+
+        //Saves and closes, as well as removes annoying back-up files
+        public static void SaveAndCloseDocument(Document doc, string destinationFilePath, bool overwrite = true)
+        {
+            string destinationDirectory = Path.GetDirectoryName(destinationFilePath);
+            Directory.CreateDirectory(destinationDirectory);
+
+            SaveAsOptions saveAsOptions = new SaveAsOptions { OverwriteExistingFile = overwrite };
+            doc.SaveAs(destinationFilePath, saveAsOptions);
+            doc.Close();
+
+            RemoveBackUpFilesFromDirectory(new FileInfo(destinationFilePath).Directory.FullName);
+        }
+
+        /// <summary>
+        /// Opens a Revit file and sets the main 3d view as the active view, with the visual style set to "Shaded"
+        /// </summary>
+        public static void OpenDocumentIntoShaded3DView(UIApplication uiApp, string filePath)
+        {
+            UIDocument uiDoc = uiApp.OpenAndActivateDocument(filePath);
+            Document doc = uiDoc.Document;
+            View3D view = GetFirstOfType<View3D>(doc);
+
+            if (view == null)
+                return;
+
+            //These UI commands must happen outside of a transaction
+            uiDoc.ActiveView = view;
+            //Close the view that opened when this document started if it's not the 3d view
+            IList<UIView> openViews = uiDoc.GetOpenUIViews();
+            foreach (UIView uiView in openViews)
+                if (uiView.ViewId != view.Id)
+                    uiView.Close();
+
+            using (Transaction transaction = new Transaction(doc))
+            {
+                transaction.Start("Set view graphics to Shaded");
+                view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(3); //3 = Shaded
+                transaction.Commit();
+            }
+        }
+
+        public static void RemoveBackUpFilesFromDirectory(string directory)
+        {
+            //Remove annoying backup files
+            foreach (string file in Directory.GetFiles(directory))
+            {
+                for (int i = 1; i < 10; i++)
+                {
+                    if (file.EndsWith($".000{i}.rvt"))
+                        File.Delete(file);
+                }
+            }
+        }
+
+        public static string WriteXyz(XYZ vector)
+        {
+            return $"({vector.X:0.##}, {vector.Y:0.##}, {vector.Z:0.##})";
+        }
+
+        public static CopyPasteOptions UseDestinationOnDuplicateNameCopyPasteOptions()
+        {
+            CopyPasteOptions copyOptions = new CopyPasteOptions();
+            copyOptions.SetDuplicateTypeNamesHandler(new UseDestinationHandler());
+            return copyOptions;
         }
     }
 }

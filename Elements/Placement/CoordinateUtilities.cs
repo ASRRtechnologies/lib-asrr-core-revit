@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using Autodesk.Revit.DB;
 
 namespace ASRR.Revit.Core.Elements.Placement
 {
@@ -52,5 +53,16 @@ namespace ASRR.Revit.Core.Elements.Placement
         }
 
 
+        public static bool ApproximateEquals(XYZ position, XYZ otherPositionInMillimeters)
+        {
+            return Math.Abs(position.X - otherPositionInMillimeters.X) < 0.05 &&
+                   Math.Abs(position.Y - otherPositionInMillimeters.Y) < 0.05 &&
+                   Math.Abs(position.Z - otherPositionInMillimeters.Z) < 0.05;
+        }
+
+        public static bool ApproximateEquals(double rotation, double otherPositionInMillimeters)
+        {
+            return Math.Abs(rotation - otherPositionInMillimeters) < 0.05;
+        }
     }
 }

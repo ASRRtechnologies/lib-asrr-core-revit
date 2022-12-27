@@ -55,12 +55,22 @@
     <Compile Include="Elements\Placement\CoordinateUtilities.cs" />
     <Compile Include="Elements\Placement\FamilyPlacer.cs" />
     <Compile Include="Elements\Rotation\ElementRotator.cs" />
-    <Compile Include="Elements\Utilities.cs" />
+    <Compile Include="Model\DegreeRotation.cs" />
+    <Compile Include="Model\RadianRotation.cs" />
+    <Compile Include="Model\VectorRotation.cs" />
+    <Compile Include="UseDestinationHandler.cs" />
+    <Compile Include="Utilities.cs" />
+    <Compile Include="Model\IPosition.cs" />
+    <Compile Include="Model\IRotation.cs" />
+    <Compile Include="Model\FeetPosition.cs" />
+    <Compile Include="Model\MillimeterPosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransformUtilities.cs" />
     <Compile Include="UI\RibbonPanelCreator\DictionaryBasedRibbonPanelCreator.cs" />
     <Compile Include="UI\RibbonPanelCreator\IRibbonPanelCreator.cs" />
     <Compile Include="UI\RibbonPanelItemCreator\IRibbonPanelItemCreator.cs" />
     <Compile Include="UI\RibbonPanelItemCreator\PushButtonRibbonPanelItemCreator.cs" />
+    <Compile Include="Warnings\WarningDiscardFailuresPreprocessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
@@ -76,5 +86,12 @@
       <Version>2023.0.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lib-asrr-core\ASRR.Core.csproj">
+      <Project>{12EA4456-8CD5-43EF-80C7-D70338C8B018}</Project>
+      <Name>ASRR.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
