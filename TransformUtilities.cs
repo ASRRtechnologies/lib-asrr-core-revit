@@ -152,5 +152,4 @@ namespace ASRR.Revit.Core
             return new MillimeterPosition(xyz);
         }
     }
-        
-    }
+}

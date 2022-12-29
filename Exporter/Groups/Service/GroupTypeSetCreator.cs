@@ -44,7 +44,8 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         {
             List<AttachedDetailGroupType> detailGroupTypes = new List<AttachedDetailGroupType>();
             List<Group> detailGroups = FindAttachedDetailGroups(doc, modelGroup);
-            List<ViewPlan> allFloorPlans = Utilities.GetAllOfType<ViewPlan>(doc).Where(v => v.ViewType == ViewType.FloorPlan).ToList();
+            List<ViewPlan> allFloorPlans = Utilities.GetAllOfType<ViewPlan>(doc)
+                .Where(v => v.ViewType == ViewType.FloorPlan).ToList();
 
             foreach (Group detailGroup in detailGroups)
             {
@@ -65,7 +66,8 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         private List<Group> FindAttachedDetailGroups(Document doc, Group modelGroup)
         {
             ElementFilter familyCategoryFilter = new ElementCategoryFilter(BuiltInCategory.OST_IOSAttachedDetailGroups);
-            ICollection<Element> detailGroups = new FilteredElementCollector(doc).WherePasses(familyCategoryFilter).ToElements();
+            ICollection<Element> detailGroups =
+                new FilteredElementCollector(doc).WherePasses(familyCategoryFilter).ToElements();
 
             return detailGroups.Where(dg => HasGroupAsParent(dg, modelGroup)).Select(dg => dg as Group).ToList();
         }

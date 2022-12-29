@@ -27,7 +27,8 @@ namespace glTFRevitExport
             var OriginY = PointInt.ConvertFeetToMillimetres(Origin.Y);
             var OriginZ = PointInt.ConvertFeetToMillimetres(Origin.Z);
 
-            List<double> glXform = new List<double>(16) {
+            List<double> glXform = new List<double>(16)
+            {
                 BasisX.X, BasisX.Y, BasisX.Z, 0,
                 BasisY.X, BasisY.Y, BasisY.Z, 0,
                 BasisZ.X, BasisZ.Y, BasisZ.Z, 0,
@@ -40,10 +41,12 @@ namespace glTFRevitExport
         public class HashSearch
         {
             string _S;
+
             public HashSearch(string s)
             {
                 _S = s;
             }
+
             public bool EqualTo(HashedType d)
             {
                 return d.hashcode.Equals(_S);
@@ -74,7 +77,6 @@ namespace glTFRevitExport
 
     class GLTFManager
     {
-
         /// <summary>
         /// Flag to write coords as Z up instead of Y up (if true).
         /// CAUTION: With local coordinate systems and transforms, this no longer
@@ -84,6 +86,7 @@ namespace glTFRevitExport
         /// flipping the camera in the viewer).
         /// </summary>
         private bool _flipCoords = false;
+
         /// <summary>
         /// Toggles the export of JSON properties as a glTF Extras
         /// object on each node.
@@ -94,10 +97,12 @@ namespace glTFRevitExport
         /// Stateful, uuid indexable list of all materials in the export.
         /// </summary>
         private IndexedDictionary<glTFMaterial> materialDict = new IndexedDictionary<glTFMaterial>();
+
         /// <summary>
         /// Dictionary of nodes keyed to their unique id.
         /// </summary>
         private Dictionary<string, Node> nodeDict = new Dictionary<string, Node>();
+
         /// <summary>
         /// Hashable container for mesh data, to aid instancing.
         /// </summary>
@@ -107,18 +112,22 @@ namespace glTFRevitExport
         /// List of root nodes defining scenes.
         /// </summary>
         public List<glTFScene> scenes = new List<glTFScene>();
+
         /// <summary>
         /// List of all buffers referencing the binary file data.
         /// </summary>
         public List<glTFBuffer> buffers = new List<glTFBuffer>();
+
         /// <summary>
         /// List of all BufferViews referencing the buffers.
         /// </summary>
         public List<glTFBufferView> bufferViews = new List<glTFBufferView>();
+
         /// <summary>
         /// List of all Accessors referencing the BufferViews.
         /// </summary>
         public List<glTFAccessor> accessors = new List<glTFAccessor>();
+
         /// <summary>
         /// Container for the vertex/face/normal information
         /// that will be serialized into a binary format
@@ -153,10 +162,7 @@ namespace glTFRevitExport
         /// </summary>
         public List<glTFMaterial> materials
         {
-            get
-            {
-                return materialDict.List;
-            }
+            get { return materialDict.List; }
         }
 
         /// <summary>
@@ -164,10 +170,7 @@ namespace glTFRevitExport
         /// </summary>
         public List<glTFMesh> meshes
         {
-            get
-            {
-                return meshContainers.Select(x => x.contents).ToList();
-            }
+            get { return meshContainers.Select(x => x.contents).ToList(); }
         }
 
         /// <summary>
@@ -175,15 +178,13 @@ namespace glTFRevitExport
         /// the current scene graph branch.
         /// </summary>
         private Stack<string> parentStack = new Stack<string>();
+
         /// <summary>
         /// The uniqueId of the currently open node.
         /// </summary>
         private string currentNodeId
         {
-            get
-            {
-                return parentStack.Peek();
-            }
+            get { return parentStack.Peek(); }
         }
 
         /// <summary>
@@ -192,15 +193,13 @@ namespace glTFRevitExport
         /// as we retreat back up the graph.
         /// </summary>
         private Stack<Dictionary<string, GeometryData>> geometryStack = new Stack<Dictionary<string, GeometryData>>();
+
         /// <summary>
         /// The geometry container for the currently open node.
         /// </summary>
         private Dictionary<string, GeometryData> currentGeom
         {
-            get
-            {
-                return geometryStack.Peek();
-            }
+            get { return geometryStack.Peek(); }
         }
 
         /// <summary>
@@ -216,6 +215,7 @@ namespace glTFRevitExport
                 {
                     spaces += "  ";
                 }
+
                 return spaces;
             }
         }
@@ -339,11 +339,12 @@ namespace glTFRevitExport
             gl_mat.name = name;
 
             glTFPBR pbr = new glTFPBR();
-            pbr.baseColorFactor = new List<float>() {
+            pbr.baseColorFactor = new List<float>()
+            {
                 matNode.Color.Red / 255f,
                 matNode.Color.Green / 255f,
                 matNode.Color.Blue / 255f,
-                1f - (float)matNode.Transparency
+                1f - (float) matNode.Transparency
             };
             pbr.metallicFactor = 0f;
             pbr.roughnessFactor = 1f;
@@ -452,7 +453,6 @@ namespace glTFRevitExport
                     meshContainers.Add(mc);
                     nodeDict[currentNodeId].mesh = meshContainers.Count - 1;
                 }
-
             }
 
             geometryStack.Pop();
@@ -477,6 +477,7 @@ namespace glTFRevitExport
                 float vFloat = Convert.ToSingle(coord);
                 bufferContents.vertexBuffer.Add(vFloat);
             }
+
             foreach (var index in geom.faces)
             {
                 bufferContents.indexBuffer.Add(index);
@@ -566,8 +567,8 @@ namespace glTFRevitExport
                 positionAccessor.componentType = ComponentType.FLOAT;
                 positionAccessor.count = geom.vertices.Count / elementsPerVertex;
                 positionAccessor.type = "VEC3";
-                positionAccessor.max = new List<float>() { vertexMinMax[1], vertexMinMax[3], vertexMinMax[5] };
-                positionAccessor.min = new List<float>() { vertexMinMax[0], vertexMinMax[2], vertexMinMax[4] };
+                positionAccessor.max = new List<float>() {vertexMinMax[1], vertexMinMax[3], vertexMinMax[5]};
+                positionAccessor.min = new List<float>() {vertexMinMax[0], vertexMinMax[2], vertexMinMax[4]};
                 accessors.Add(positionAccessor);
                 bufferData.vertexAccessorIndex = accessors.Count - 1;
 
@@ -591,8 +592,8 @@ namespace glTFRevitExport
                 faceAccessor.componentType = ComponentType.UNSIGNED_INT;
                 faceAccessor.count = numIndexes;
                 faceAccessor.type = "SCALAR";
-                faceAccessor.max = new List<float>() { faceMinMax[1] };
-                faceAccessor.min = new List<float>() { faceMinMax[0] };
+                faceAccessor.max = new List<float>() {faceMinMax[1]};
+                faceAccessor.min = new List<float>() {faceMinMax[0]};
                 accessors.Add(faceAccessor);
                 bufferData.indexAccessorIndex = accessors.Count - 1;
 
@@ -610,7 +611,8 @@ namespace glTFRevitExport
         public bool isFinalized = false;
         public Element element;
 
-        public Node(Element elem, int index, bool exportProperties = true, bool isInstance = false, string heirarchyFormat = "")
+        public Node(Element elem, int index, bool exportProperties = true, bool isInstance = false,
+            string heirarchyFormat = "")
         {
             Debug.WriteLine(String.Format("{1}  Creating new node: {0}", elem, heirarchyFormat));
 
@@ -631,8 +633,10 @@ namespace glTFRevitExport
                 extras.Properties = Util.GetElementProperties(elem, true);
                 this.extras = extras;
             }
+
             Debug.WriteLine(String.Format("{0}    Exported Properties", heirarchyFormat));
         }
+
         public Node(int index)
         {
             this.name = "::rootNode::";

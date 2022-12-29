@@ -5,25 +5,24 @@ using Autodesk.Revit.UI;
 
 namespace ASRR.Revit.Core.Model
 {
+    public class MillimeterPosition : IPosition
+    {
+        public XYZ Position { get; set; }
 
-        public class MillimeterPosition : IPosition
+        public MillimeterPosition(XYZ position)
         {
-            public XYZ Position { get; set; }
-
-            public MillimeterPosition(XYZ position)
-            {
-                Position = position;
-            }
-
-            public XYZ PositionInFeet => CoordinateUtilities.ConvertMmToFeet(Position);
-
-            public XYZ PositionInMillimeters => Position;
-
-            public bool IsAlmostEqualTo(IPosition other)
-            {
-                return CoordinateUtilities.ApproximateEquals(Position, other.PositionInMillimeters);
-            }
-
-            public static MillimeterPosition Zero => new MillimeterPosition(XYZ.Zero);
+            Position = position;
         }
+
+        public XYZ PositionInFeet => CoordinateUtilities.ConvertMmToFeet(Position);
+
+        public XYZ PositionInMillimeters => Position;
+
+        public bool IsAlmostEqualTo(IPosition other)
+        {
+            return CoordinateUtilities.ApproximateEquals(Position, other.PositionInMillimeters);
+        }
+
+        public static MillimeterPosition Zero => new MillimeterPosition(XYZ.Zero);
+    }
 }

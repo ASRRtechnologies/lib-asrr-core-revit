@@ -26,7 +26,8 @@ namespace glTFRevitExport
                 if (vec3[i + 2] < minVertexZ) minVertexZ = vec3[i + 2];
                 if (vec3[i + 2] > maxVertexZ) maxVertexZ = vec3[i + 2];
             }
-            return new int[] { minVertexX, maxVertexX, minVertexY, maxVertexY, minVertexZ, maxVertexZ };
+
+            return new int[] {minVertexX, maxVertexX, minVertexY, maxVertexY, minVertexZ, maxVertexZ};
         }
 
         public static long[] GetVec3MinMax(List<long> vec3)
@@ -48,12 +49,12 @@ namespace glTFRevitExport
                 if (vec3[i + 2] < minVertexZ) minVertexZ = vec3[i + 2];
                 if (vec3[i + 2] > maxVertexZ) maxVertexZ = vec3[i + 2];
             }
-            return new long[] { minVertexX, maxVertexX, minVertexY, maxVertexY, minVertexZ, maxVertexZ };
+
+            return new long[] {minVertexX, maxVertexX, minVertexY, maxVertexY, minVertexZ, maxVertexZ};
         }
 
         public static float[] GetVec3MinMax(List<float> vec3)
         {
-
             List<float> xValues = new List<float>();
             List<float> yValues = new List<float>();
             List<float> zValues = new List<float>();
@@ -71,7 +72,7 @@ namespace glTFRevitExport
             float maxZ = zValues.Max();
             float minZ = zValues.Min();
 
-            return new float[] { minX, maxX, minY, maxY, minZ, maxZ };
+            return new float[] {minX, maxX, minY, maxY, minZ, maxZ};
         }
 
         public static int[] GetScalarMinMax(List<int> scalars)
@@ -86,7 +87,8 @@ namespace glTFRevitExport
                 int currentMax = Math.Max(maxFaceIndex, scalars[i]);
                 if (currentMax > maxFaceIndex) maxFaceIndex = currentMax;
             }
-            return new int[] { minFaceIndex, maxFaceIndex };
+
+            return new int[] {minFaceIndex, maxFaceIndex};
         }
 
         /// <summary>
@@ -110,9 +112,9 @@ namespace glTFRevitExport
         public static string PointString(XYZ p)
         {
             return string.Format("({0},{1},{2})",
-              RealString(p.X),
-              RealString(p.Y),
-              RealString(p.Z));
+                RealString(p.X),
+                RealString(p.Y),
+                RealString(p.Z));
         }
 
         /// <summary>
@@ -122,9 +124,9 @@ namespace glTFRevitExport
         /// </summary>
         public static int ColorToInt(Color color)
         {
-            return ((int)color.Red) << 16
-              | ((int)color.Green) << 8
-              | (int)color.Blue;
+            return ((int) color.Red) << 16
+                   | ((int) color.Green) << 8
+                   | (int) color.Blue;
         }
 
         /// <summary>
@@ -142,25 +144,29 @@ namespace glTFRevitExport
             val = false;
 
             if (s.Equals(Boolean.TrueString,
-              StringComparison.OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
                 val = true;
                 return true;
             }
+
             if (s.Equals(Boolean.FalseString,
-              StringComparison.OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
+
             if (s.Equals("1"))
             {
                 val = true;
                 return true;
             }
+
             if (s.Equals("0"))
             {
                 return true;
             }
+
             s = s.ToLower();
 
             if ('t' == s[0] || 'y' == s[0])
@@ -168,10 +174,12 @@ namespace glTFRevitExport
                 val = true;
                 return true;
             }
+
             if ('f' == s[0] || 'n' == s[0])
             {
                 return true;
             }
+
             return false;
         }
 
@@ -200,21 +208,21 @@ namespace glTFRevitExport
             string typeName = e.GetType().Name;
 
             string categoryName = (null == e.Category)
-              ? string.Empty
-              : e.Category.Name + " ";
+                ? string.Empty
+                : e.Category.Name + " ";
 
             string familyName = (null == fi)
-              ? string.Empty
-              : fi.Symbol.Family.Name + " ";
+                ? string.Empty
+                : fi.Symbol.Family.Name + " ";
 
             string symbolName = (null == fi
-              || e.Name.Equals(fi.Symbol.Name))
+                                 || e.Name.Equals(fi.Symbol.Name))
                 ? string.Empty
                 : fi.Symbol.Name + " ";
 
             return string.Format("{0} {1}{2}{3}<{4} {5}>",
-              typeName, categoryName, familyName,
-              symbolName, e.Id.IntegerValue, e.Name);
+                typeName, categoryName, familyName,
+                symbolName, e.Id.IntegerValue, e.Name);
         }
 
         /// <summary>
@@ -226,7 +234,7 @@ namespace glTFRevitExport
         public static Dictionary<string, string> GetElementProperties(Element e, bool includeType)
         {
             IList<Parameter> parameters
-              = e.GetOrderedParameters();
+                = e.GetOrderedParameters();
 
             Dictionary<string, string> a = new Dictionary<string, string>(parameters.Count);
 
@@ -235,7 +243,6 @@ namespace glTFRevitExport
             {
                 a.Add("Element Category", e.Category.Name);
             }
-
 
 
             foreach (Parameter p in parameters)
@@ -253,6 +260,7 @@ namespace glTFRevitExport
                     {
                         val = p.AsValueString();
                     }
+
                     if (!string.IsNullOrEmpty(val))
                     {
                         a.Add(key, val);
@@ -284,6 +292,7 @@ namespace glTFRevitExport
                             {
                                 val = p.AsValueString();
                             }
+
                             if (!string.IsNullOrEmpty(val))
                             {
                                 a.Add(key, val);

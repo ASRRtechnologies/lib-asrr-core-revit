@@ -23,9 +23,9 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
             public int GetHashCode(PointInt p)
             {
                 return (p.X.ToString()
-                  + "," + p.Y.ToString()
-                  + "," + p.Z.ToString())
-                  .GetHashCode();
+                        + "," + p.Y.ToString()
+                        + "," + p.Z.ToString())
+                    .GetHashCode();
             }
         }
 
@@ -40,8 +40,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         public int AddVertex(PointInt p)
         {
             return ContainsKey(p)
-              ? this[p]
-              : this[p] = Count;
+                ? this[p]
+                : this[p] = Count;
         }
     }
 }

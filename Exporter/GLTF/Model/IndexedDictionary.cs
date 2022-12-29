@@ -13,6 +13,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         private Dictionary<string, int> _dict = new Dictionary<string, int>();
         public List<T> List { get; } = new List<T>();
         public string CurrentKey { get; private set; }
+
         public Dictionary<string, T> Dict
         {
             get
@@ -22,6 +23,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
                 {
                     output.Add(kvp.Key, List[kvp.Value]);
                 }
+
                 return output;
             }
         }

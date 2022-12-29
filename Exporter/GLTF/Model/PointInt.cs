@@ -35,13 +35,13 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
             {
                 return _eps > d
                     ? 0
-                    : (long)(_feet_to_mm * d + 0.5);
+                    : (long) (_feet_to_mm * d + 0.5);
             }
             else
             {
                 return _eps > -d
                     ? 0
-                    : (long)(_feet_to_mm * d - 0.5);
+                    : (long) (_feet_to_mm * d - 0.5);
             }
         }
 
@@ -71,6 +71,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
                     d = Z - a.Z;
                 }
             }
+
             return (0 == d) ? 0 : ((0 < d) ? 1 : -1);
         }
     }

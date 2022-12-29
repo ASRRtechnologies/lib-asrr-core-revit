@@ -57,7 +57,6 @@ namespace ASRR.Revit.Core.Elements
             return null;
         }
 
-        
 
         public static IEnumerable<Room> GetRooms(Document doc)
         {
@@ -96,7 +95,7 @@ namespace ASRR.Revit.Core.Elements
                             parameter.Set(value);
                             return true;
                         case StorageType.Double:
-                            parameter.Set((double)value);
+                            parameter.Set((double) value);
                             return true;
                         case StorageType.String:
                             return false;
@@ -215,7 +214,7 @@ namespace ASRR.Revit.Core.Elements
             string destinationDirectory = Path.GetDirectoryName(destinationFilePath);
             Directory.CreateDirectory(destinationDirectory);
 
-            SaveAsOptions saveAsOptions = new SaveAsOptions { OverwriteExistingFile = overwrite };
+            SaveAsOptions saveAsOptions = new SaveAsOptions {OverwriteExistingFile = overwrite};
             doc.SaveAs(destinationFilePath, saveAsOptions);
             doc.Close();
 

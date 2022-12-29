@@ -23,17 +23,20 @@ namespace ASRR.Revit.Core.Elements.Placement
             XYZ location,
             ElementId levelId,
             FamilySymbol symbol,
-            double rotation, 
-            bool mirrored, 
+            double rotation,
+            bool mirrored,
             Dictionary<string, object> parameters)
         {
             var level = doc.GetElement(levelId) as Level;
 
-            using (var transaction = new Transaction(doc)) {
+            using (var transaction = new Transaction(doc))
+            {
                 transaction.Start("Place family instance");
-                var newFamilyInstance = doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
-                Log.Info($"Placed new family instance at {location} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
-                var instanceLocation = ((LocationPoint)newFamilyInstance.Location).Point;
+                var newFamilyInstance =
+                    doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
+                Log.Info(
+                    $"Placed new family instance at {location} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
+                var instanceLocation = ((LocationPoint) newFamilyInstance.Location).Point;
 
                 if (rotation != 0.0)
                 {
@@ -46,7 +49,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                     Log.Info($"Mirroring element");
                     using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, location)) // ZX
                     {
-                        ElementTransformUtils.MirrorElements(doc, new[]{newFamilyInstance.Id}, plane, false);
+                        ElementTransformUtils.MirrorElements(doc, new[] {newFamilyInstance.Id}, plane, false);
                     }
                 }
 
@@ -73,18 +76,20 @@ namespace ASRR.Revit.Core.Elements.Placement
             using (var transaction = new Transaction(doc))
             {
                 transaction.Start("Place family instance");
-                var newFamilyInstance = doc.Create.NewFamilyInstance(curve, symbol, level, StructuralType.NonStructural);
-                Log.Info($"Placed new family instance based on curve {curve.GetEndPoint(0)} {curve.Length} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
+                var newFamilyInstance =
+                    doc.Create.NewFamilyInstance(curve, symbol, level, StructuralType.NonStructural);
+                Log.Info(
+                    $"Placed new family instance based on curve {curve.GetEndPoint(0)} {curve.Length} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
 
                 if (mirrored)
                 {
                     Log.Info($"Mirroring element");
                     using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, curve.GetEndPoint(0))) // ZX
                     {
-                        ElementTransformUtils.MirrorElements(doc, new[] { newFamilyInstance.Id }, plane, false);
+                        ElementTransformUtils.MirrorElements(doc, new[] {newFamilyInstance.Id}, plane, false);
                     }
                 }
- 
+
                 ParameterUtils.Apply(newFamilyInstance, parameters);
 
                 transaction.Commit();
@@ -106,7 +111,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                 return null;
             }
         }
-        
+
         public IEnumerable<FamilyInstance> GetFamilyInstancesByFamilyName(Document doc, string familyName)
         {
             try
@@ -123,7 +128,8 @@ namespace ASRR.Revit.Core.Elements.Placement
             }
         }
 
-        public IEnumerable<FamilyInstance> GetFamilyInstancesByFamilyAndType(Document doc, string familyName, string typeName)
+        public IEnumerable<FamilyInstance> GetFamilyInstancesByFamilyAndType(Document doc, string familyName,
+            string typeName)
         {
             try
             {

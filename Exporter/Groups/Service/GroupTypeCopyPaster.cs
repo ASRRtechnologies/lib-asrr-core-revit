@@ -27,13 +27,15 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
                 transaction.Start("Copy paste grouptypes");
                 foreach (GroupTypeSet groupTypeSet in groupTypeSets)
                 {
-                    bool copied = CopyGroupTypeSetOrGetExisting(groupTypeSet, sourceDoc, destinationDoc, ref copiedGroupTypeSets);
+                    bool copied = CopyGroupTypeSetOrGetExisting(groupTypeSet, sourceDoc, destinationDoc,
+                        ref copiedGroupTypeSets);
                     if (copied == false)
                     {
                         transaction.RollBack();
                         return null;
                     }
                 }
+
                 transaction.Commit();
             }
 
@@ -108,9 +110,11 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
             };
         }
 
-        private bool CopyGroupTypeSetOrGetExisting(GroupTypeSet groupTypeSet, Document sourceDoc, Document destinationDoc, ref List<GroupTypeSet> copiedGroupTypeSets)
+        private bool CopyGroupTypeSetOrGetExisting(GroupTypeSet groupTypeSet, Document sourceDoc,
+            Document destinationDoc, ref List<GroupTypeSet> copiedGroupTypeSets)
         {
-            List<GroupType> existingGroupTypes = ASRR.Revit.Core.Elements.Utilities.GetAllOfType<GroupType>(destinationDoc);
+            List<GroupType> existingGroupTypes =
+                ASRR.Revit.Core.Elements.Utilities.GetAllOfType<GroupType>(destinationDoc);
 
             GroupTypeSet existingGroupTypeSet = CreateExistingGroupTypeSet(groupTypeSet, existingGroupTypes);
             //If the modelgrouptype already exists in the destination document, use it instead of copying it in again
@@ -143,7 +147,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
             CopyPasteOptions copyOptions = Utilities.UseDestinationOnDuplicateNameCopyPasteOptions();
 
-            List<ElementId> ids = new List<ElementId> { groupTypeSet.ModelGroupType.Id };
+            List<ElementId> ids = new List<ElementId> {groupTypeSet.ModelGroupType.Id};
             ids.AddRange(
                 groupTypeSet.AttachedDetailGroupTypes.Select(detailGroupType => detailGroupType.GroupType.Id));
 
@@ -155,7 +159,8 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
             }
             catch (Exception e)
             {
-                _logger.Error($"Failed to copy grouptypeset '{groupTypeSet.ModelGroupType.Name}', because: '{e.Message}'");
+                _logger.Error(
+                    $"Failed to copy grouptypeset '{groupTypeSet.ModelGroupType.Name}', because: '{e.Message}'");
                 return null;
             }
 
