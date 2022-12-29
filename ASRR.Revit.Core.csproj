@@ -55,7 +55,19 @@
     <Compile Include="Elements\Placement\CoordinateUtilities.cs" />
     <Compile Include="Elements\Placement\FamilyPlacer.cs" />
     <Compile Include="Elements\Rotation\ElementRotator.cs" />
-    <Compile Include="ExportUtilities.cs" />
+    <Compile Include="Exporter\ExportUtilities.cs" />
+    <Compile Include="Exporter\GLTF\Model\VertexLookupInt.cs" />
+    <Compile Include="Exporter\GLTF\Model\GeometryData.cs" />
+    <Compile Include="Exporter\GLTF\Model\GLTF.cs" />
+    <Compile Include="Exporter\GLTF\Model\GltfExportContext.cs" />
+    <Compile Include="Exporter\GLTF\Model\IndexedDictionary.cs" />
+    <Compile Include="Exporter\GLTF\Model\PointInt.cs" />
+    <Compile Include="Exporter\GLTF\Service\GTLFManager.cs" />
+    <Compile Include="Exporter\GLTF\Service\Util.cs" />
+    <Compile Include="Exporter\Groups\Model\AttachedDetailGroupType.cs" />
+    <Compile Include="Exporter\Groups\Model\GroupTypeSet.cs" />
+    <Compile Include="Exporter\Groups\Service\GroupTypeCopyPaster.cs" />
+    <Compile Include="Exporter\Groups\Service\GroupTypeSetCreator.cs" />
     <Compile Include="Model\DegreeRotation.cs" />
     <Compile Include="Model\RadianRotation.cs" />
     <Compile Include="Model\VectorRotation.cs" />
@@ -93,6 +105,5 @@
       <Name>ASRR.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
