@@ -19,13 +19,19 @@ namespace ASRR.Revit.Core.Exporter
                 FilePath = exportPath,
                 FitDirection = FitDirectionType.Horizontal,
                 HLRandWFViewsFileType = ImageFileType.PNG,
+                ShadowViewsFileType = ImageFileType.PNG,
                 ImageResolution = ImageResolution.DPI_600,
                 ExportRange = ExportRange.SetOfViews,
-                ViewName = exportPath,
             };
             var ids = new List<ElementId> { view.Id };
             opt.SetViewsAndSheets(ids);
             document.ExportImage(opt);
+
+
+            System.IO.File.Move(
+                    exportPath.Replace(".png", "") + " - 3D View - {3D}.png",
+                    exportPath);
+
             Log.Info($"Exporting PNG to: {exportPath}");
         }
     }
