@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -12,50 +11,45 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     public class GlTfExportConfigs
     {
         /// <summary>
-        /// Flag to export all buffers into a single .bin file (if true).
-        /// </summary>
-        public bool SingleBinary = true;
-
-        /// <summary>
-        /// Flag to export all the properties for each element.
+        ///     Flag to export all the properties for each element.
         /// </summary>
         public bool ExportProperties = true;
 
         /// <summary>
-        /// Flag to write coords as Z up instead of Y up (if true).
+        ///     Flag to write coords as Z up instead of Y up (if true).
         /// </summary>
         public bool FlipCoords = true;
 
         /// <summary>
-        /// Include non-standard elements that are not part of
-        /// official glTF spec. If false, non-standard elements will be excluded
+        ///     Include non-standard elements that are not part of
+        ///     official glTF spec. If false, non-standard elements will be excluded
         /// </summary>
         public bool IncludeNonStdElements = true;
+
+        /// <summary>
+        ///     Flag to export all buffers into a single .bin file (if true).
+        /// </summary>
+        public bool SingleBinary = true;
     }
 
     public class GlTFExportContext : IExportContext
     {
-        private GlTfExportConfigs _cfgs = new GlTfExportConfigs();
+        private readonly GlTfExportConfigs _cfgs = new GlTfExportConfigs();
 
         /// <summary>
-        /// The name for the export files
+        ///     The directory for the export files
         /// </summary>
-        private string _filename;
+        private readonly string _directory;
 
         /// <summary>
-        /// The directory for the export files
+        ///     The name for the export files
         /// </summary>
-        private string _directory;
+        private readonly string _filename;
 
-        private bool _skipElementFlag = false;
+        private bool _skipElementFlag;
+        private readonly Stack<Document> documentStack = new Stack<Document>();
 
-        private GLTFManager manager = new GLTFManager();
-        private Stack<Document> documentStack = new Stack<Document>();
-
-        private Document _doc
-        {
-            get { return documentStack.Peek(); }
-        }
+        private readonly GLTFManager manager = new GLTFManager();
 
         public GlTFExportContext(Document doc, string filename, string directory, GlTfExportConfigs configs = null)
         {
@@ -67,9 +61,11 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
             _cfgs = configs ?? _cfgs;
         }
 
+        private Document _doc => documentStack.Peek();
+
         /// <summary>
-        /// Runs once at beginning of export. Sets up the root node
-        /// and scene.
+        ///     Runs once at beginning of export. Sets up the root node
+        ///     and scene.
         /// </summary>
         /// <returns></returns>
         public bool Start()
@@ -80,14 +76,14 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// Runs once at end of export. Serializes the gltf
-        /// properties and wites out the *.gltf and *.bin files.
+        ///     Runs once at end of export. Serializes the gltf
+        ///     properties and wites out the *.gltf and *.bin files.
         /// </summary>
         public void Finish()
         {
             Debug.WriteLine("Finishing...");
 
-            glTFContainer container = manager.Finish();
+            var container = manager.Finish();
 
             if (_cfgs.IncludeNonStdElements)
             {
@@ -97,13 +93,13 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
 
                 // Add gridlines as gltf nodes in the format:
                 // Origin {Vec3<double>}, Direction {Vec3<double>}, Length {double}
-                FilteredElementCollector col = new FilteredElementCollector(_doc)
+                var col = new FilteredElementCollector(_doc)
                     .OfClass(typeof(Grid));
 
                 var grids = col.ToElements();
                 foreach (Grid g in grids)
                 {
-                    Line l = g.Curve as Line;
+                    var l = g.Curve as Line;
 
                     var origin = l.Origin;
                     var direction = l.Direction;
@@ -111,8 +107,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
 
                     var xtras = new glTFExtras();
                     var grid = new GridParameters();
-                    grid.origin = new List<double>() {origin.X, origin.Y, origin.Z};
-                    grid.direction = new List<double>() {direction.X, direction.Y, direction.Z};
+                    grid.origin = new List<double> {origin.X, origin.Y, origin.Z};
+                    grid.direction = new List<double> {direction.X, direction.Y, direction.Z};
                     grid.length = length;
                     xtras.GridParameters = grid;
                     xtras.UniqueId = g.UniqueId;
@@ -129,8 +125,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
 
             if (_cfgs.SingleBinary)
             {
-                int bytePosition = 0;
-                int currentBuffer = 0;
+                var bytePosition = 0;
+                var currentBuffer = 0;
                 foreach (var view in container.glTF.bufferViews)
                 {
                     if (view.buffer == 0)
@@ -147,28 +143,22 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
                     }
                 }
 
-                glTFBuffer buffer = new glTFBuffer();
+                var buffer = new glTFBuffer();
                 buffer.uri = _filename + ".bin";
                 buffer.byteLength = bytePosition;
                 container.glTF.buffers.Clear();
                 container.glTF.buffers.Add(buffer);
 
-                using (FileStream f = File.Create(Path.Combine(_directory, buffer.uri)))
+                using (var f = File.Create(Path.Combine(_directory, buffer.uri)))
                 {
-                    using (BinaryWriter writer = new BinaryWriter(f))
+                    using (var writer = new BinaryWriter(f))
                     {
                         foreach (var bin in container.binaries)
                         {
-                            foreach (var coord in bin.contents.vertexBuffer)
-                            {
-                                writer.Write((float) coord);
-                            }
+                            foreach (var coord in bin.contents.vertexBuffer) writer.Write(coord);
 
                             // TODO: add writer for normals buffer
-                            foreach (var index in bin.contents.indexBuffer)
-                            {
-                                writer.Write((int) index);
-                            }
+                            foreach (var index in bin.contents.indexBuffer) writer.Write(index);
                         }
                     }
                 }
@@ -177,47 +167,38 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
             {
                 // Write the *.bin files
                 foreach (var bin in container.binaries)
-                {
-                    using (FileStream f = File.Create(Path.Combine(_directory, bin.name)))
+                    using (var f = File.Create(Path.Combine(_directory, bin.name)))
                     {
-                        using (BinaryWriter writer = new BinaryWriter(f))
+                        using (var writer = new BinaryWriter(f))
                         {
-                            foreach (var coord in bin.contents.vertexBuffer)
-                            {
-                                writer.Write((float) coord);
-                            }
+                            foreach (var coord in bin.contents.vertexBuffer) writer.Write(coord);
 
                             // TODO: add writer for normals buffer
-                            foreach (var index in bin.contents.indexBuffer)
-                            {
-                                writer.Write((int) index);
-                            }
+                            foreach (var index in bin.contents.indexBuffer) writer.Write(index);
                         }
                     }
-                }
             }
 
             // Write the *.gltf file
-            string serializedModel = JsonConvert.SerializeObject(container.glTF,
+            var serializedModel = JsonConvert.SerializeObject(container.glTF,
                 new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
             File.WriteAllText(Path.Combine(_directory, _filename + ".gltf"), serializedModel);
         }
 
         /// <summary>
-        /// Runs once for each element.
+        ///     Runs once for each element.
         /// </summary>
         /// <param name="elementId">ElementId of Element being processed</param>
         /// <returns></returns>
         public RenderNodeAction OnElementBegin(ElementId elementId)
         {
-            Element e = _doc.GetElement(elementId);
-            Debug.WriteLine(
-                String.Format("{2}OnElementBegin: {1}-{0}", e.Name, elementId, manager.formatDebugHeirarchy));
+            var e = _doc.GetElement(elementId);
+            Debug.WriteLine("{2}OnElementBegin: {1}-{0}", e.Name, elementId, manager.formatDebugHeirarchy);
 
             if (manager.containsNode(e.UniqueId))
             {
                 // Duplicate element, skip adding.
-                Debug.WriteLine(String.Format("{0}  Duplicate Element!", manager.formatDebugHeirarchy));
+                Debug.WriteLine(string.Format("{0}  Duplicate Element!", manager.formatDebugHeirarchy));
                 _skipElementFlag = true;
                 return RenderNodeAction.Skip;
             }
@@ -228,22 +209,22 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// Runs every time, and immediately prior to, a mesh being processed (OnPolymesh).
-        /// It supplies the material for the mesh, and we use this to create a new material
-        /// in our material container, or switch the current material if it already exists.
-        /// TODO: Handle more complex materials.
+        ///     Runs every time, and immediately prior to, a mesh being processed (OnPolymesh).
+        ///     It supplies the material for the mesh, and we use this to create a new material
+        ///     in our material container, or switch the current material if it already exists.
+        ///     TODO: Handle more complex materials.
         /// </summary>
         /// <param name="node"></param>
         public void OnMaterial(MaterialNode matNode)
         {
-            Debug.WriteLine(String.Format("{0}  OnMaterial", manager.formatDebugHeirarchy));
+            Debug.WriteLine(string.Format("{0}  OnMaterial", manager.formatDebugHeirarchy));
             string matName;
             string uniqueId;
 
-            ElementId id = matNode.MaterialId;
+            var id = matNode.MaterialId;
             if (id != ElementId.InvalidElementId)
             {
-                Element m = _doc.GetElement(matNode.MaterialId);
+                var m = _doc.GetElement(matNode.MaterialId);
                 matName = m.Name;
                 uniqueId = m.UniqueId;
             }
@@ -255,15 +236,15 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
                     Util.RealString(matNode.Transparency * 100));
             }
 
-            Debug.WriteLine(String.Format("{1}  Material: {0}", matName, manager.formatDebugHeirarchy));
+            Debug.WriteLine("{1}  Material: {0}", matName, manager.formatDebugHeirarchy);
             manager.SwitchMaterial(matNode, matName, uniqueId);
         }
 
         /// <summary>
-        /// Runs for every polymesh being processed. Typically this is a single face
-        /// of an element's mesh. Vertices and faces are keyed on the element/material combination 
-        /// (this is important because within a single element, materials can be changed and 
-        /// repeated in unknown order).
+        ///     Runs for every polymesh being processed. Typically this is a single face
+        ///     of an element's mesh. Vertices and faces are keyed on the element/material combination
+        ///     (this is important because within a single element, materials can be changed and
+        ///     repeated in unknown order).
         /// </summary>
         /// <param name="polymesh"></param>
         public void OnPolymesh(PolymeshTopology polymesh)
@@ -272,7 +253,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// Runs at the end of an element being processed, after all other calls for that element.
+        ///     Runs at the end of an element being processed, after all other calls for that element.
         /// </summary>
         /// <param name="elementId"></param>
         public void OnElementEnd(ElementId elementId)
@@ -287,18 +268,17 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// This is called when family instances are encountered, after OnElementBegin.
-        /// We're using it here to maintain the transform stack for that element's heirarchy.
+        ///     This is called when family instances are encountered, after OnElementBegin.
+        ///     We're using it here to maintain the transform stack for that element's heirarchy.
         /// </summary>
         /// <param name="node"></param>
         /// <returns></returns>
         public RenderNodeAction OnInstanceBegin(InstanceNode node)
         {
-            ElementId symId = node.GetSymbolId();
-            Element symElem = _doc.GetElement(symId);
+            var symId = node.GetSymbolId();
+            var symElem = _doc.GetElement(symId);
 
-            Debug.WriteLine(String.Format("{2}OnInstanceBegin: {0}-{1}", symId, symElem.Name,
-                manager.formatDebugHeirarchy));
+            Debug.WriteLine("{2}OnInstanceBegin: {0}-{1}", symId, symElem.Name, manager.formatDebugHeirarchy);
 
             var nodeXform = node.GetTransform();
             manager.OpenNode(symElem, nodeXform.IsIdentity ? null : nodeXform, true);
@@ -307,14 +287,14 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// This is called when family instances are encountered, before OnElementEnd.
-        /// We're using it here to maintain the transform stack for that element's heirarchy.
+        ///     This is called when family instances are encountered, before OnElementEnd.
+        ///     We're using it here to maintain the transform stack for that element's heirarchy.
         /// </summary>
         /// <param name="node"></param>
         public void OnInstanceEnd(InstanceNode node)
         {
-            ElementId symId = node.GetSymbolId();
-            Element symElem = _doc.GetElement(symId);
+            var symId = node.GetSymbolId();
+            var symElem = _doc.GetElement(symId);
 
             manager.CloseNode(symElem, true);
         }
@@ -338,11 +318,10 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
 
         public RenderNodeAction OnLinkBegin(LinkNode node)
         {
-            ElementId symId = node.GetSymbolId();
-            Element symElem = _doc.GetElement(symId);
+            var symId = node.GetSymbolId();
+            var symElem = _doc.GetElement(symId);
 
-            Debug.WriteLine(String.Format("{2}OnLinkBegin: {0}-{1}", symId, symElem.Name,
-                manager.formatDebugHeirarchy));
+            Debug.WriteLine("{2}OnLinkBegin: {0}-{1}", symId, symElem.Name, manager.formatDebugHeirarchy);
 
             var nodeXform = node.GetTransform();
             manager.OpenNode(symElem, nodeXform.IsIdentity ? null : nodeXform, true);
@@ -353,7 +332,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
 
         public void OnLinkEnd(LinkNode node)
         {
-            Debug.WriteLine(String.Format("{0}OnLinkEnd",
+            Debug.WriteLine(string.Format("{0}OnLinkEnd",
                 manager.formatDebugHeirarchy.Substring(0, manager.formatDebugHeirarchy.Count() - 2)));
             manager.CloseNode();
 

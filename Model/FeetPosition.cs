@@ -1,18 +1,16 @@
-﻿using ASRR.Core.MathUtils;
-using ASRR.Revit.Core.Elements.Placement;
+﻿using ASRR.Revit.Core.Elements.Placement;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 
 namespace ASRR.Revit.Core.Model
 {
     public class FeetPosition : IPosition
     {
-        public XYZ Position { get; set; }
-
         public FeetPosition(XYZ position)
         {
             Position = position;
         }
+
+        public XYZ Position { get; set; }
 
         public XYZ PositionInFeet => Position;
 

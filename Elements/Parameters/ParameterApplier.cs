@@ -1,6 +1,6 @@
-﻿using Autodesk.Revit.DB;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ASRR.Revit.Core.Elements.Placement;
+using Autodesk.Revit.DB;
 using NLog;
 
 namespace ASRR.Revit.Core.Elements.Parameters
@@ -10,7 +10,7 @@ namespace ASRR.Revit.Core.Elements.Parameters
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// This method applies a set of parameters to a specific element. Should be called inside a Revit transaction. 
+        ///     This method applies a set of parameters to a specific element. Should be called inside a Revit transaction.
         /// </summary>
         public static bool Apply(Element element, Dictionary<string, object> parameters, bool convert = false)
         {

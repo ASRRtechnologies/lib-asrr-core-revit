@@ -20,14 +20,14 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         public List<GroupTypeSet> CopyGroupTypeSets(Document sourceDoc, Document destinationDoc,
             IEnumerable<GroupTypeSet> groupTypeSets)
         {
-            List<GroupTypeSet> copiedGroupTypeSets = new List<GroupTypeSet>();
+            var copiedGroupTypeSets = new List<GroupTypeSet>();
 
-            using (Transaction transaction = WarningDiscardFailuresPreprocessor.GetTransaction(destinationDoc, _logger))
+            using (var transaction = WarningDiscardFailuresPreprocessor.GetTransaction(destinationDoc, _logger))
             {
                 transaction.Start("Copy paste grouptypes");
-                foreach (GroupTypeSet groupTypeSet in groupTypeSets)
+                foreach (var groupTypeSet in groupTypeSets)
                 {
-                    bool copied = CopyGroupTypeSetOrGetExisting(groupTypeSet, sourceDoc, destinationDoc,
+                    var copied = CopyGroupTypeSetOrGetExisting(groupTypeSet, sourceDoc, destinationDoc,
                         ref copiedGroupTypeSets);
                     if (copied == false)
                     {
@@ -54,7 +54,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
             Group modelGroup;
 
-            using (Transaction transaction = WarningDiscardFailuresPreprocessor.GetTransaction(doc, _logger))
+            using (var transaction = WarningDiscardFailuresPreprocessor.GetTransaction(doc, _logger))
             {
                 transaction.Start("Instantiate modelgroup");
 
@@ -78,16 +78,16 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         //If the grouptype(s) already exist in the destination file, create a grouptypeset with the existing grouptype(s)
         private GroupTypeSet CreateExistingGroupTypeSet(GroupTypeSet groupTypeSet, List<GroupType> existingGroupTypes)
         {
-            GroupType existingModelGroupType =
+            var existingModelGroupType =
                 existingGroupTypes.Find(gt => gt.Name == groupTypeSet.ModelGroupType.Name);
 
             if (existingModelGroupType == null)
                 return null;
 
-            List<AttachedDetailGroupType> attachedDetailGroupTypes = new List<AttachedDetailGroupType>();
-            foreach (AttachedDetailGroupType detailGroupType in groupTypeSet.AttachedDetailGroupTypes)
+            var attachedDetailGroupTypes = new List<AttachedDetailGroupType>();
+            foreach (var detailGroupType in groupTypeSet.AttachedDetailGroupTypes)
             {
-                GroupType existingDetailGroupType = existingGroupTypes
+                var existingDetailGroupType = existingGroupTypes
                     .Find(gt => gt.Name == detailGroupType.GroupType.Name);
                 if (existingDetailGroupType == null)
                 {
@@ -113,10 +113,10 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         private bool CopyGroupTypeSetOrGetExisting(GroupTypeSet groupTypeSet, Document sourceDoc,
             Document destinationDoc, ref List<GroupTypeSet> copiedGroupTypeSets)
         {
-            List<GroupType> existingGroupTypes =
-                ASRR.Revit.Core.Elements.Utilities.GetAllOfType<GroupType>(destinationDoc);
+            var existingGroupTypes =
+                Utilities.GetAllOfType<GroupType>(destinationDoc);
 
-            GroupTypeSet existingGroupTypeSet = CreateExistingGroupTypeSet(groupTypeSet, existingGroupTypes);
+            var existingGroupTypeSet = CreateExistingGroupTypeSet(groupTypeSet, existingGroupTypes);
             //If the modelgrouptype already exists in the destination document, use it instead of copying it in again
             if (existingGroupTypeSet != null)
             {
@@ -126,7 +126,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
             //It doesn't already exist, copy the types over
             else
             {
-                GroupTypeSet copiedGroupTypeSet = CopyGroupTypeSet(sourceDoc, destinationDoc, groupTypeSet);
+                var copiedGroupTypeSet = CopyGroupTypeSet(sourceDoc, destinationDoc, groupTypeSet);
                 if (copiedGroupTypeSet == null) return false;
 
                 copiedGroupTypeSets.Add(copiedGroupTypeSet);
@@ -145,9 +145,9 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         {
             ICollection<ElementId> copiedIds = new List<ElementId>();
 
-            CopyPasteOptions copyOptions = Utilities.UseDestinationOnDuplicateNameCopyPasteOptions();
+            var copyOptions = Utilities.UseDestinationOnDuplicateNameCopyPasteOptions();
 
-            List<ElementId> ids = new List<ElementId> {groupTypeSet.ModelGroupType.Id};
+            var ids = new List<ElementId> {groupTypeSet.ModelGroupType.Id};
             ids.AddRange(
                 groupTypeSet.AttachedDetailGroupTypes.Select(detailGroupType => detailGroupType.GroupType.Id));
 
@@ -164,7 +164,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
                 return null;
             }
 
-            List<GroupType> copiedGroupTypes =
+            var copiedGroupTypes =
                 copiedIds.Select(id => destinationDoc.GetElement(id) as GroupType).ToList();
 
             return CreateCopiedGroupTypeSet(groupTypeSet, copiedGroupTypes);
@@ -172,13 +172,13 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
         private GroupTypeSet CreateCopiedGroupTypeSet(GroupTypeSet groupTypeSet, List<GroupType> copiedGroupTypes)
         {
-            GroupType copiedGroupType = FindGroupType(copiedGroupTypes, groupTypeSet.ModelGroupType.Name);
+            var copiedGroupType = FindGroupType(copiedGroupTypes, groupTypeSet.ModelGroupType.Name);
             if (copiedGroupType == null) return null;
 
-            List<AttachedDetailGroupType> attachedDetailGroupTypes =
+            var attachedDetailGroupTypes =
                 FindAttachedDetailGroupTypes(groupTypeSet.AttachedDetailGroupTypes, copiedGroupTypes);
 
-            GroupTypeSet copiedGroupTypeSet = new GroupTypeSet
+            var copiedGroupTypeSet = new GroupTypeSet
             {
                 ModelGroupType = copiedGroupType,
                 PositionOffset = groupTypeSet.PositionOffset,
@@ -196,7 +196,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
                 return null;
             }
 
-            GroupType groupType = copiedGroupTypes.Count == 1
+            var groupType = copiedGroupTypes.Count == 1
                 ? copiedGroupTypes.First()
                 : copiedGroupTypes.FirstOrDefault(type => type.Name == name);
 
@@ -209,10 +209,10 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         private List<AttachedDetailGroupType> FindAttachedDetailGroupTypes(
             List<AttachedDetailGroupType> detailGroupTypes, List<GroupType> groupTypes)
         {
-            List<AttachedDetailGroupType> attachedDetailGroupTypes = new List<AttachedDetailGroupType>();
-            foreach (AttachedDetailGroupType detailGroupType in detailGroupTypes)
+            var attachedDetailGroupTypes = new List<AttachedDetailGroupType>();
+            foreach (var detailGroupType in detailGroupTypes)
             {
-                GroupType copiedDetailGroupType = groupTypes.FirstOrDefault(type =>
+                var copiedDetailGroupType = groupTypes.FirstOrDefault(type =>
                     type.Name == detailGroupType.GroupType.Name);
 
                 if (copiedDetailGroupType == null)
@@ -234,10 +234,10 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         private void EnableAttachedDetailGroupsInFloorPlans(Document doc, Group modelGroup,
             List<AttachedDetailGroupType> attachedDetailGroupTypes)
         {
-            List<ViewPlan> allFloorPlans = ASRR.Revit.Core.Elements.Utilities.GetAllOfType<ViewPlan>(doc)
+            var allFloorPlans = Utilities.GetAllOfType<ViewPlan>(doc)
                 .Where(v => v.ViewType == ViewType.FloorPlan).ToList();
 
-            foreach (AttachedDetailGroupType detailGroupType in attachedDetailGroupTypes)
+            foreach (var detailGroupType in attachedDetailGroupTypes)
             {
                 if (detailGroupType.GroupType == null)
                 {
@@ -245,7 +245,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
                     return;
                 }
 
-                ViewPlan floorPlan = allFloorPlans.FirstOrDefault(v => v.Name == detailGroupType.FloorPlanName);
+                var floorPlan = allFloorPlans.FirstOrDefault(v => v.Name == detailGroupType.FloorPlanName);
 
                 if (modelGroup == null)
                     _logger.Error("Could not find modelgroup. It's likely that it couldn't be successfully placed");

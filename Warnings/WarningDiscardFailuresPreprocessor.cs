@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using NLog;
-using System.Collections.Generic;
 
 namespace ASRR.Revit.Core.Warnings
 {
@@ -8,7 +7,7 @@ namespace ASRR.Revit.Core.Warnings
     {
         private readonly ILogger _logger;
 
-        public WarningDiscardFailuresPreprocessor(ILogger logger = null)
+        private WarningDiscardFailuresPreprocessor(ILogger logger = null)
         {
             if (logger != null)
                 _logger = logger;
@@ -16,12 +15,12 @@ namespace ASRR.Revit.Core.Warnings
 
         public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
         {
-            IList<FailureMessageAccessor> failures = failuresAccessor.GetFailureMessages();
+            var failures = failuresAccessor.GetFailureMessages();
 
-            foreach (FailureMessageAccessor failure in failures)
+            foreach (var failure in failures)
             {
                 //FailureDefinitionId id = failure.GetFailureDefinitionId();
-                FailureSeverity failureSeverity = failuresAccessor.GetSeverity();
+                var failureSeverity = failuresAccessor.GetSeverity();
 
                 //Simply eat all warnings
                 if (failureSeverity == FailureSeverity.Warning)
@@ -36,8 +35,8 @@ namespace ASRR.Revit.Core.Warnings
 
         public static Transaction GetTransaction(Document doc, ILogger logger = null)
         {
-            Transaction transaction = new Transaction(doc);
-            FailureHandlingOptions failureHandlingOptions = transaction.GetFailureHandlingOptions();
+            var transaction = new Transaction(doc);
+            var failureHandlingOptions = transaction.GetFailureHandlingOptions();
 
             failureHandlingOptions.SetFailuresPreprocessor(new WarningDiscardFailuresPreprocessor(logger));
             transaction.SetFailureHandlingOptions(failureHandlingOptions);

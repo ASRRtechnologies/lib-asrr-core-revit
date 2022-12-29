@@ -1,21 +1,19 @@
-﻿using Autodesk.Revit.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
+using System.Text;
 using ASRR.Revit.Core.Exporter.GLTF.Model;
-using NLog.Targets;
+using Autodesk.Revit.DB;
 
 namespace glTFRevitExport
 {
-    static class ManagerUtils
+    internal static class ManagerUtils
     {
-        static public List<double> ConvertXForm(Transform xform)
+        public static List<double> ConvertXForm(Transform xform)
         {
             if (xform == null || xform.IsIdentity) return null;
 
@@ -27,7 +25,7 @@ namespace glTFRevitExport
             var OriginY = PointInt.ConvertFeetToMillimetres(Origin.Y);
             var OriginZ = PointInt.ConvertFeetToMillimetres(Origin.Z);
 
-            List<double> glXform = new List<double>(16)
+            var glXform = new List<double>(16)
             {
                 BasisX.X, BasisX.Y, BasisX.Z, 0,
                 BasisY.X, BasisY.Y, BasisY.Z, 0,
@@ -38,9 +36,27 @@ namespace glTFRevitExport
             return glXform;
         }
 
+        public static string GenerateSHA256Hash<T>(T data)
+        {
+            var binFormatter = new BinaryFormatter();
+            var mStream = new MemoryStream();
+            binFormatter.Serialize(mStream, data);
+
+            using (var hasher = SHA256.Create())
+            {
+                mStream.Position = 0;
+                var byteHash = hasher.ComputeHash(mStream);
+
+                var sBuilder = new StringBuilder();
+                for (var i = 0; i < byteHash.Length; i++) sBuilder.Append(byteHash[i].ToString("x2"));
+
+                return sBuilder.ToString();
+            }
+        }
+
         public class HashSearch
         {
-            string _S;
+            private readonly string _S;
 
             public HashSearch(string s)
             {
@@ -52,91 +68,84 @@ namespace glTFRevitExport
                 return d.hashcode.Equals(_S);
             }
         }
-
-        static public string GenerateSHA256Hash<T>(T data)
-        {
-            var binFormatter = new BinaryFormatter();
-            var mStream = new MemoryStream();
-            binFormatter.Serialize(mStream, data);
-
-            using (SHA256 hasher = SHA256.Create())
-            {
-                mStream.Position = 0;
-                byte[] byteHash = hasher.ComputeHash(mStream);
-
-                var sBuilder = new StringBuilder();
-                for (int i = 0; i < byteHash.Length; i++)
-                {
-                    sBuilder.Append(byteHash[i].ToString("x2"));
-                }
-
-                return sBuilder.ToString();
-            }
-        }
     }
 
-    class GLTFManager
+    internal class GLTFManager
     {
         /// <summary>
-        /// Flag to write coords as Z up instead of Y up (if true).
-        /// CAUTION: With local coordinate systems and transforms, this no longer
-        /// produces expected results. TODO on fixing it, however there is a larger
-        /// philisophical debtate to be had over whether flipping coordinates in
-        /// source CAD applications should EVER be the correct thing to do (as opposed to
-        /// flipping the camera in the viewer).
-        /// </summary>
-        private bool _flipCoords = false;
-
-        /// <summary>
-        /// Toggles the export of JSON properties as a glTF Extras
-        /// object on each node.
+        ///     Toggles the export of JSON properties as a glTF Extras
+        ///     object on each node.
         /// </summary>
         private bool _exportProperties = true;
 
         /// <summary>
-        /// Stateful, uuid indexable list of all materials in the export.
+        ///     Flag to write coords as Z up instead of Y up (if true).
+        ///     CAUTION: With local coordinate systems and transforms, this no longer
+        ///     produces expected results. TODO on fixing it, however there is a larger
+        ///     philisophical debtate to be had over whether flipping coordinates in
+        ///     source CAD applications should EVER be the correct thing to do (as opposed to
+        ///     flipping the camera in the viewer).
         /// </summary>
-        private IndexedDictionary<glTFMaterial> materialDict = new IndexedDictionary<glTFMaterial>();
+        private readonly bool _flipCoords = false;
 
         /// <summary>
-        /// Dictionary of nodes keyed to their unique id.
-        /// </summary>
-        private Dictionary<string, Node> nodeDict = new Dictionary<string, Node>();
-
-        /// <summary>
-        /// Hashable container for mesh data, to aid instancing.
-        /// </summary>
-        private List<MeshContainer> meshContainers = new List<MeshContainer>();
-
-        /// <summary>
-        /// List of root nodes defining scenes.
-        /// </summary>
-        public List<glTFScene> scenes = new List<glTFScene>();
-
-        /// <summary>
-        /// List of all buffers referencing the binary file data.
-        /// </summary>
-        public List<glTFBuffer> buffers = new List<glTFBuffer>();
-
-        /// <summary>
-        /// List of all BufferViews referencing the buffers.
-        /// </summary>
-        public List<glTFBufferView> bufferViews = new List<glTFBufferView>();
-
-        /// <summary>
-        /// List of all Accessors referencing the BufferViews.
+        ///     List of all Accessors referencing the BufferViews.
         /// </summary>
         public List<glTFAccessor> accessors = new List<glTFAccessor>();
 
         /// <summary>
-        /// Container for the vertex/face/normal information
-        /// that will be serialized into a binary format
-        /// for the final *.bin files.
+        ///     Container for the vertex/face/normal information
+        ///     that will be serialized into a binary format
+        ///     for the final *.bin files.
         /// </summary>
         public List<glTFBinaryData> binaryFileData = new List<glTFBinaryData>();
 
         /// <summary>
-        /// Ordered list of all nodes
+        ///     List of all buffers referencing the binary file data.
+        /// </summary>
+        public List<glTFBuffer> buffers = new List<glTFBuffer>();
+
+        /// <summary>
+        ///     List of all BufferViews referencing the buffers.
+        /// </summary>
+        public List<glTFBufferView> bufferViews = new List<glTFBufferView>();
+
+        /// <summary>
+        ///     Stack maintaining the geometry containers for each
+        ///     node down the current scene graph branch. These are popped
+        ///     as we retreat back up the graph.
+        /// </summary>
+        private readonly Stack<Dictionary<string, GeometryData>> geometryStack =
+            new Stack<Dictionary<string, GeometryData>>();
+
+        /// <summary>
+        ///     Stateful, uuid indexable list of all materials in the export.
+        /// </summary>
+        private readonly IndexedDictionary<glTFMaterial> materialDict = new IndexedDictionary<glTFMaterial>();
+
+        /// <summary>
+        ///     Hashable container for mesh data, to aid instancing.
+        /// </summary>
+        private readonly List<MeshContainer> meshContainers = new List<MeshContainer>();
+
+        /// <summary>
+        ///     Dictionary of nodes keyed to their unique id.
+        /// </summary>
+        private readonly Dictionary<string, Node> nodeDict = new Dictionary<string, Node>();
+
+        /// <summary>
+        ///     Stack maintaining the uniqueId's of each node down
+        ///     the current scene graph branch.
+        /// </summary>
+        private readonly Stack<string> parentStack = new Stack<string>();
+
+        /// <summary>
+        ///     List of root nodes defining scenes.
+        /// </summary>
+        public List<glTFScene> scenes = new List<glTFScene>();
+
+        /// <summary>
+        ///     Ordered list of all nodes
         /// </summary>
         public List<glTFNode> nodes
         {
@@ -148,7 +157,45 @@ namespace glTFRevitExport
         }
 
         /// <summary>
-        /// Returns true if the unique id is already present in the list of nodes.
+        ///     List of all materials referenced by meshes.
+        /// </summary>
+        public List<glTFMaterial> materials => materialDict.List;
+
+        /// <summary>
+        ///     List of all meshes referenced by nodes.
+        /// </summary>
+        public List<glTFMesh> meshes
+        {
+            get { return meshContainers.Select(x => x.contents).ToList(); }
+        }
+
+        /// <summary>
+        ///     The uniqueId of the currently open node.
+        /// </summary>
+        private string currentNodeId => parentStack.Peek();
+
+        /// <summary>
+        ///     The geometry container for the currently open node.
+        /// </summary>
+        private Dictionary<string, GeometryData> currentGeom => geometryStack.Peek();
+
+        /// <summary>
+        ///     Returns proper tab alignment for displaying element
+        ///     hierarchy in debug printing.
+        /// </summary>
+        public string formatDebugHeirarchy
+        {
+            get
+            {
+                var spaces = "";
+                for (var i = 0; i < parentStack.Count; i++) spaces += "  ";
+
+                return spaces;
+            }
+        }
+
+        /// <summary>
+        ///     Returns true if the unique id is already present in the list of nodes.
         /// </summary>
         /// <param name="uniqueId"></param>
         /// <returns></returns>
@@ -157,86 +204,23 @@ namespace glTFRevitExport
             return nodeDict.ContainsKey(uniqueId);
         }
 
-        /// <summary>
-        /// List of all materials referenced by meshes.
-        /// </summary>
-        public List<glTFMaterial> materials
-        {
-            get { return materialDict.List; }
-        }
-
-        /// <summary>
-        /// List of all meshes referenced by nodes.
-        /// </summary>
-        public List<glTFMesh> meshes
-        {
-            get { return meshContainers.Select(x => x.contents).ToList(); }
-        }
-
-        /// <summary>
-        /// Stack maintaining the uniqueId's of each node down
-        /// the current scene graph branch.
-        /// </summary>
-        private Stack<string> parentStack = new Stack<string>();
-
-        /// <summary>
-        /// The uniqueId of the currently open node.
-        /// </summary>
-        private string currentNodeId
-        {
-            get { return parentStack.Peek(); }
-        }
-
-        /// <summary>
-        /// Stack maintaining the geometry containers for each
-        /// node down the current scene graph branch. These are popped
-        /// as we retreat back up the graph.
-        /// </summary>
-        private Stack<Dictionary<string, GeometryData>> geometryStack = new Stack<Dictionary<string, GeometryData>>();
-
-        /// <summary>
-        /// The geometry container for the currently open node.
-        /// </summary>
-        private Dictionary<string, GeometryData> currentGeom
-        {
-            get { return geometryStack.Peek(); }
-        }
-
-        /// <summary>
-        /// Returns proper tab alignment for displaying element
-        /// hierarchy in debug printing.
-        /// </summary>
-        public string formatDebugHeirarchy
-        {
-            get
-            {
-                string spaces = "";
-                for (int i = 0; i < parentStack.Count; i++)
-                {
-                    spaces += "  ";
-                }
-
-                return spaces;
-            }
-        }
-
         public void Start(bool exportProperties = true)
         {
-            this._exportProperties = exportProperties;
+            _exportProperties = exportProperties;
 
-            Node rootNode = new Node(0);
+            var rootNode = new Node(0);
             rootNode.children = new List<int>();
             nodeDict.Add(rootNode.id, rootNode);
             parentStack.Push(rootNode.id);
 
-            glTFScene defaultScene = new glTFScene();
+            var defaultScene = new glTFScene();
             defaultScene.nodes.Add(0);
             scenes.Add(defaultScene);
         }
 
         public glTFContainer Finish()
         {
-            glTF model = new glTF();
+            var model = new glTF();
             model.asset = new glTFVersion();
             model.scenes = scenes;
             model.nodes = nodes;
@@ -246,7 +230,7 @@ namespace glTFRevitExport
             model.bufferViews = bufferViews;
             model.accessors = accessors;
 
-            glTFContainer container = new glTFContainer();
+            var container = new glTFContainer();
             container.glTF = model;
             container.binaries = binaryFileData;
 
@@ -276,29 +260,26 @@ namespace glTFRevitExport
             //    //nodeDict[currentNodeId].matrix = ManagerUtils.ConvertXForm(xform);
             //    //return;
             //}
-            bool exportNodeProperties = _exportProperties;
-            if (isInstance == true && elem is FamilySymbol) exportNodeProperties = false;
+            var exportNodeProperties = _exportProperties;
+            if (isInstance && elem is FamilySymbol) exportNodeProperties = false;
 
-            Node node = new Node(elem, nodeDict.Count, exportNodeProperties, isInstance, formatDebugHeirarchy);
+            var node = new Node(elem, nodeDict.Count, exportNodeProperties, isInstance, formatDebugHeirarchy);
 
             if (parentStack.Count > 0)
             {
-                string parentId = parentStack.Peek();
-                Node parentNode = nodeDict[parentId];
+                var parentId = parentStack.Peek();
+                var parentNode = nodeDict[parentId];
                 if (parentNode.children == null) parentNode.children = new List<int>();
                 nodeDict[parentId].children.Add(node.index);
             }
 
             parentStack.Push(node.id);
-            if (xform != null)
-            {
-                node.matrix = ManagerUtils.ConvertXForm(xform);
-            }
+            if (xform != null) node.matrix = ManagerUtils.ConvertXForm(xform);
 
             nodeDict.Add(node.id, node);
 
             OpenGeometry();
-            Debug.WriteLine(String.Format("{0}Node Open", formatDebugHeirarchy));
+            Debug.WriteLine(string.Format("{0}Node Open", formatDebugHeirarchy));
         }
 
         public void CloseNode(Element elem = null, bool isInstance = false)
@@ -322,24 +303,21 @@ namespace glTFRevitExport
             //    //return;
             //}
 
-            Debug.WriteLine(String.Format("{0}Closing Node", formatDebugHeirarchy));
+            Debug.WriteLine(string.Format("{0}Closing Node", formatDebugHeirarchy));
 
-            if (currentGeom != null)
-            {
-                CloseGeometry();
-            }
+            if (currentGeom != null) CloseGeometry();
 
-            Debug.WriteLine(String.Format("{0}  Node Closed", formatDebugHeirarchy));
+            Debug.WriteLine(string.Format("{0}  Node Closed", formatDebugHeirarchy));
             parentStack.Pop();
         }
 
         public void SwitchMaterial(MaterialNode matNode, string name = null, string id = null)
         {
-            glTFMaterial gl_mat = new glTFMaterial();
+            var gl_mat = new glTFMaterial();
             gl_mat.name = name;
 
-            glTFPBR pbr = new glTFPBR();
-            pbr.baseColorFactor = new List<float>()
+            var pbr = new glTFPBR();
+            pbr.baseColorFactor = new List<float>
             {
                 matNode.Color.Red / 255f,
                 matNode.Color.Green / 255f,
@@ -362,15 +340,12 @@ namespace glTFRevitExport
         {
             if (currentNodeId == null) throw new Exception();
 
-            string vertex_key = currentNodeId + "_" + materialDict.CurrentKey;
-            if (currentGeom.ContainsKey(vertex_key) == false)
-            {
-                currentGeom.Add(vertex_key, new GeometryData());
-            }
+            var vertex_key = currentNodeId + "_" + materialDict.CurrentKey;
+            if (currentGeom.ContainsKey(vertex_key) == false) currentGeom.Add(vertex_key, new GeometryData());
 
             // Populate normals from this polymesh
-            IList<XYZ> norms = polymesh.GetNormals();
-            foreach (XYZ norm in norms)
+            var norms = polymesh.GetNormals();
+            foreach (var norm in norms)
             {
                 currentGeom[vertex_key].normals.Add(norm.X);
                 currentGeom[vertex_key].normals.Add(norm.Y);
@@ -378,12 +353,12 @@ namespace glTFRevitExport
             }
 
             // Populate vertex and faces data
-            IList<XYZ> pts = polymesh.GetPoints();
-            foreach (PolymeshFacet facet in polymesh.GetFacets())
+            var pts = polymesh.GetPoints();
+            foreach (var facet in polymesh.GetFacets())
             {
-                int v1 = currentGeom[vertex_key].vertDictionary.AddVertex(new PointInt(pts[facet.V1], _flipCoords));
-                int v2 = currentGeom[vertex_key].vertDictionary.AddVertex(new PointInt(pts[facet.V2], _flipCoords));
-                int v3 = currentGeom[vertex_key].vertDictionary.AddVertex(new PointInt(pts[facet.V3], _flipCoords));
+                var v1 = currentGeom[vertex_key].vertDictionary.AddVertex(new PointInt(pts[facet.V1], _flipCoords));
+                var v2 = currentGeom[vertex_key].vertDictionary.AddVertex(new PointInt(pts[facet.V2], _flipCoords));
+                var v3 = currentGeom[vertex_key].vertDictionary.AddVertex(new PointInt(pts[facet.V3], _flipCoords));
 
                 currentGeom[vertex_key].faces.Add(v1);
                 currentGeom[vertex_key].faces.Add(v2);
@@ -393,34 +368,31 @@ namespace glTFRevitExport
 
         public void CloseGeometry()
         {
-            Debug.WriteLine(String.Format("{0}  Closing Geometry", formatDebugHeirarchy));
+            Debug.WriteLine(string.Format("{0}  Closing Geometry", formatDebugHeirarchy));
             // Create the new mesh and populate the primitives with GeometryData
-            glTFMesh mesh = new glTFMesh();
+            var mesh = new glTFMesh();
             mesh.primitives = new List<glTFMeshPrimitive>();
 
             // transfer ordered vertices from vertex dictionary to vertices list
-            foreach (KeyValuePair<string, GeometryData> key_geom in currentGeom)
+            foreach (var key_geom in currentGeom)
             {
-                string key = key_geom.Key;
-                GeometryData geom = key_geom.Value;
-                foreach (KeyValuePair<PointInt, int> point_index in geom.vertDictionary)
+                var key = key_geom.Key;
+                var geom = key_geom.Value;
+                foreach (var point_index in geom.vertDictionary)
                 {
-                    PointInt point = point_index.Key;
+                    var point = point_index.Key;
                     geom.vertices.Add(point.X);
                     geom.vertices.Add(point.Y);
                     geom.vertices.Add(point.Z);
                 }
 
                 // convert GeometryData objects into glTFMeshPrimitive
-                string material_key = key.Split('_')[1];
+                var material_key = key.Split('_')[1];
 
-                glTFBinaryData bufferMeta = processGeometry(geom, key);
-                if (bufferMeta.hashcode != null)
-                {
-                    binaryFileData.Add(bufferMeta);
-                }
+                var bufferMeta = processGeometry(geom, key);
+                if (bufferMeta.hashcode != null) binaryFileData.Add(bufferMeta);
 
-                glTFMeshPrimitive primative = new glTFMeshPrimitive();
+                var primative = new glTFMeshPrimitive();
 
                 primative.attributes.POSITION = bufferMeta.vertexAccessorIndex;
                 primative.indices = bufferMeta.indexAccessorIndex;
@@ -434,9 +406,9 @@ namespace glTFRevitExport
             if (mesh.primitives.Count() > 0)
             {
                 // Prevent mesh duplication by hash checking
-                string meshHash = ManagerUtils.GenerateSHA256Hash(mesh);
-                ManagerUtils.HashSearch hs = new ManagerUtils.HashSearch(meshHash);
-                int idx = meshContainers.FindIndex(hs.EqualTo);
+                var meshHash = ManagerUtils.GenerateSHA256Hash(mesh);
+                var hs = new ManagerUtils.HashSearch(meshHash);
+                var idx = meshContainers.FindIndex(hs.EqualTo);
 
                 if (idx != -1)
                 {
@@ -447,7 +419,7 @@ namespace glTFRevitExport
                 else
                 {
                     // create new mesh and add it's index to the current node.
-                    MeshContainer mc = new MeshContainer();
+                    var mc = new MeshContainer();
                     mc.hashcode = meshHash;
                     mc.contents = mesh;
                     meshContainers.Add(mc);
@@ -456,12 +428,11 @@ namespace glTFRevitExport
             }
 
             geometryStack.Pop();
-            return;
         }
 
         /// <summary>
-        /// Takes the intermediate geometry data and performs the calculations
-        /// to convert that into glTF buffers, views, and accessors.
+        ///     Takes the intermediate geometry data and performs the calculations
+        ///     to convert that into glTF buffers, views, and accessors.
         /// </summary>
         /// <param name="geomData"></param>
         /// <param name="name">Unique name for the .bin file that will be produced.</param>
@@ -469,23 +440,20 @@ namespace glTFRevitExport
         private glTFBinaryData processGeometry(GeometryData geom, string name)
         {
             // TODO: rename this type to glTFBufferMeta ?
-            glTFBinaryData bufferData = new glTFBinaryData();
-            glTFBinaryBufferContents bufferContents = new glTFBinaryBufferContents();
+            var bufferData = new glTFBinaryData();
+            var bufferContents = new glTFBinaryBufferContents();
 
             foreach (var coord in geom.vertices)
             {
-                float vFloat = Convert.ToSingle(coord);
+                var vFloat = Convert.ToSingle(coord);
                 bufferContents.vertexBuffer.Add(vFloat);
             }
 
-            foreach (var index in geom.faces)
-            {
-                bufferContents.indexBuffer.Add(index);
-            }
+            foreach (var index in geom.faces) bufferContents.indexBuffer.Add(index);
 
             // Prevent buffer duplication by hash checking
-            string calculatedHash = ManagerUtils.GenerateSHA256Hash(bufferContents);
-            ManagerUtils.HashSearch hs = new ManagerUtils.HashSearch(calculatedHash);
+            var calculatedHash = ManagerUtils.GenerateSHA256Hash(bufferContents);
+            var hs = new ManagerUtils.HashSearch(calculatedHash);
             var match = binaryFileData.Find(hs.EqualTo);
 
             if (match != null)
@@ -495,137 +463,135 @@ namespace glTFRevitExport
                 bufferData.indexAccessorIndex = match.indexAccessorIndex;
                 return bufferData;
             }
-            else
-            {
-                // add a buffer
-                glTFBuffer buffer = new glTFBuffer();
-                buffer.uri = name + ".bin";
-                buffers.Add(buffer);
-                int bufferIdx = buffers.Count - 1;
 
-                /**
+            // add a buffer
+            var buffer = new glTFBuffer();
+            buffer.uri = name + ".bin";
+            buffers.Add(buffer);
+            var bufferIdx = buffers.Count - 1;
+
+            /**
                  * Buffer Data
                  **/
-                bufferData.name = buffer.uri;
-                bufferData.contents = bufferContents;
-                // TODO: Uncomment for normals
-                //foreach (var normal in geomData.normals)
-                //{
-                //    bufferData.normalBuffer.Add((float)normal);
-                //}
+            bufferData.name = buffer.uri;
+            bufferData.contents = bufferContents;
+            // TODO: Uncomment for normals
+            //foreach (var normal in geomData.normals)
+            //{
+            //    bufferData.normalBuffer.Add((float)normal);
+            //}
 
-                // Get max and min for vertex data
-                float[] vertexMinMax = Util.GetVec3MinMax(bufferContents.vertexBuffer);
-                // Get max and min for index data
-                int[] faceMinMax = Util.GetScalarMinMax(bufferContents.indexBuffer);
-                // TODO: Uncomment for normals
-                // Get max and min for normal data
-                //float[] normalMinMax = getVec3MinMax(bufferData.normalBuffer);
+            // Get max and min for vertex data
+            var vertexMinMax = Util.GetVec3MinMax(bufferContents.vertexBuffer);
+            // Get max and min for index data
+            var faceMinMax = Util.GetScalarMinMax(bufferContents.indexBuffer);
+            // TODO: Uncomment for normals
+            // Get max and min for normal data
+            //float[] normalMinMax = getVec3MinMax(bufferData.normalBuffer);
 
-                /**
+            /**
                  * BufferViews
                  **/
-                // Add a vec3 buffer view
-                int elementsPerVertex = 3;
-                int bytesPerElement = 4;
-                int bytesPerVertex = elementsPerVertex * bytesPerElement;
-                int numVec3 = (geom.vertices.Count) / elementsPerVertex;
-                int sizeOfVec3View = numVec3 * bytesPerVertex;
-                glTFBufferView vec3View = new glTFBufferView();
-                vec3View.buffer = bufferIdx;
-                vec3View.byteOffset = 0;
-                vec3View.byteLength = sizeOfVec3View;
-                vec3View.target = Targets.ARRAY_BUFFER;
-                bufferViews.Add(vec3View);
-                int vec3ViewIdx = bufferViews.Count - 1;
+            // Add a vec3 buffer view
+            var elementsPerVertex = 3;
+            var bytesPerElement = 4;
+            var bytesPerVertex = elementsPerVertex * bytesPerElement;
+            var numVec3 = geom.vertices.Count / elementsPerVertex;
+            var sizeOfVec3View = numVec3 * bytesPerVertex;
+            var vec3View = new glTFBufferView();
+            vec3View.buffer = bufferIdx;
+            vec3View.byteOffset = 0;
+            vec3View.byteLength = sizeOfVec3View;
+            vec3View.target = Targets.ARRAY_BUFFER;
+            bufferViews.Add(vec3View);
+            var vec3ViewIdx = bufferViews.Count - 1;
 
-                // TODO: Add a normals (vec3) buffer view
+            // TODO: Add a normals (vec3) buffer view
 
-                // Add a faces / indexes buffer view
-                int elementsPerIndex = 1;
-                int bytesPerIndexElement = 4;
-                int bytesPerIndex = elementsPerIndex * bytesPerIndexElement;
-                int numIndexes = geom.faces.Count;
-                int sizeOfIndexView = numIndexes * bytesPerIndex;
-                glTFBufferView facesView = new glTFBufferView();
-                facesView.buffer = bufferIdx;
-                facesView.byteOffset = vec3View.byteLength;
-                facesView.byteLength = sizeOfIndexView;
-                facesView.target = Targets.ELEMENT_ARRAY_BUFFER;
-                bufferViews.Add(facesView);
-                int facesViewIdx = bufferViews.Count - 1;
+            // Add a faces / indexes buffer view
+            var elementsPerIndex = 1;
+            var bytesPerIndexElement = 4;
+            var bytesPerIndex = elementsPerIndex * bytesPerIndexElement;
+            var numIndexes = geom.faces.Count;
+            var sizeOfIndexView = numIndexes * bytesPerIndex;
+            var facesView = new glTFBufferView();
+            facesView.buffer = bufferIdx;
+            facesView.byteOffset = vec3View.byteLength;
+            facesView.byteLength = sizeOfIndexView;
+            facesView.target = Targets.ELEMENT_ARRAY_BUFFER;
+            bufferViews.Add(facesView);
+            var facesViewIdx = bufferViews.Count - 1;
 
-                buffers[bufferIdx].byteLength = vec3View.byteLength + facesView.byteLength;
+            buffers[bufferIdx].byteLength = vec3View.byteLength + facesView.byteLength;
 
-                /**
+            /**
                  * Accessors
                  **/
-                // add a position accessor
-                glTFAccessor positionAccessor = new glTFAccessor();
-                positionAccessor.bufferView = vec3ViewIdx;
-                positionAccessor.byteOffset = 0;
-                positionAccessor.componentType = ComponentType.FLOAT;
-                positionAccessor.count = geom.vertices.Count / elementsPerVertex;
-                positionAccessor.type = "VEC3";
-                positionAccessor.max = new List<float>() {vertexMinMax[1], vertexMinMax[3], vertexMinMax[5]};
-                positionAccessor.min = new List<float>() {vertexMinMax[0], vertexMinMax[2], vertexMinMax[4]};
-                accessors.Add(positionAccessor);
-                bufferData.vertexAccessorIndex = accessors.Count - 1;
+            // add a position accessor
+            var positionAccessor = new glTFAccessor();
+            positionAccessor.bufferView = vec3ViewIdx;
+            positionAccessor.byteOffset = 0;
+            positionAccessor.componentType = ComponentType.FLOAT;
+            positionAccessor.count = geom.vertices.Count / elementsPerVertex;
+            positionAccessor.type = "VEC3";
+            positionAccessor.max = new List<float> {vertexMinMax[1], vertexMinMax[3], vertexMinMax[5]};
+            positionAccessor.min = new List<float> {vertexMinMax[0], vertexMinMax[2], vertexMinMax[4]};
+            accessors.Add(positionAccessor);
+            bufferData.vertexAccessorIndex = accessors.Count - 1;
 
-                // TODO: Uncomment for normals
-                // add a normals accessor
-                //glTFAccessor normalsAccessor = new glTFAccessor();
-                //normalsAccessor.bufferView = vec3ViewIdx;
-                //normalsAccessor.byteOffset = (positionAccessor.count) * bytesPerVertex;
-                //normalsAccessor.componentType = ComponentType.FLOAT;
-                //normalsAccessor.count = geom.data.normals.Count / elementsPerVertex;
-                //normalsAccessor.type = "VEC3";
-                //normalsAccessor.max = new List<float>() { normalMinMax[1], normalMinMax[3], normalMinMax[5] };
-                //normalsAccessor.min = new List<float>() { normalMinMax[0], normalMinMax[2], normalMinMax[4] };
-                //this.accessors.Add(normalsAccessor);
-                //bufferData.normalsAccessorIndex = this.accessors.Count - 1;
+            // TODO: Uncomment for normals
+            // add a normals accessor
+            //glTFAccessor normalsAccessor = new glTFAccessor();
+            //normalsAccessor.bufferView = vec3ViewIdx;
+            //normalsAccessor.byteOffset = (positionAccessor.count) * bytesPerVertex;
+            //normalsAccessor.componentType = ComponentType.FLOAT;
+            //normalsAccessor.count = geom.data.normals.Count / elementsPerVertex;
+            //normalsAccessor.type = "VEC3";
+            //normalsAccessor.max = new List<float>() { normalMinMax[1], normalMinMax[3], normalMinMax[5] };
+            //normalsAccessor.min = new List<float>() { normalMinMax[0], normalMinMax[2], normalMinMax[4] };
+            //this.accessors.Add(normalsAccessor);
+            //bufferData.normalsAccessorIndex = this.accessors.Count - 1;
 
-                // add a face accessor
-                glTFAccessor faceAccessor = new glTFAccessor();
-                faceAccessor.bufferView = facesViewIdx;
-                faceAccessor.byteOffset = 0;
-                faceAccessor.componentType = ComponentType.UNSIGNED_INT;
-                faceAccessor.count = numIndexes;
-                faceAccessor.type = "SCALAR";
-                faceAccessor.max = new List<float>() {faceMinMax[1]};
-                faceAccessor.min = new List<float>() {faceMinMax[0]};
-                accessors.Add(faceAccessor);
-                bufferData.indexAccessorIndex = accessors.Count - 1;
+            // add a face accessor
+            var faceAccessor = new glTFAccessor();
+            faceAccessor.bufferView = facesViewIdx;
+            faceAccessor.byteOffset = 0;
+            faceAccessor.componentType = ComponentType.UNSIGNED_INT;
+            faceAccessor.count = numIndexes;
+            faceAccessor.type = "SCALAR";
+            faceAccessor.max = new List<float> {faceMinMax[1]};
+            faceAccessor.min = new List<float> {faceMinMax[0]};
+            accessors.Add(faceAccessor);
+            bufferData.indexAccessorIndex = accessors.Count - 1;
 
-                bufferData.hashcode = calculatedHash;
+            bufferData.hashcode = calculatedHash;
 
-                return bufferData;
-            }
+            return bufferData;
         }
     }
 
-    class Node : glTFNode
+    internal class Node : glTFNode
     {
-        public int index;
-        public string id;
-        public bool isFinalized = false;
         public Element element;
+        public string id;
+        public int index;
+        public bool isFinalized = false;
 
         public Node(Element elem, int index, bool exportProperties = true, bool isInstance = false,
             string heirarchyFormat = "")
         {
-            Debug.WriteLine(String.Format("{1}  Creating new node: {0}", elem, heirarchyFormat));
+            Debug.WriteLine("{1}  Creating new node: {0}", elem, heirarchyFormat);
 
-            this.element = elem;
-            this.name = Util.ElementDescription(elem);
-            this.id = isInstance ? elem.UniqueId + "::" + Guid.NewGuid().ToString() : elem.UniqueId;
+            element = elem;
+            name = Util.ElementDescription(elem);
+            id = isInstance ? elem.UniqueId + "::" + Guid.NewGuid() : elem.UniqueId;
             this.index = index;
-            Debug.WriteLine(String.Format("{1}    Name:{0}", this.name, heirarchyFormat));
+            Debug.WriteLine("{1}    Name:{0}", name, heirarchyFormat);
 
             if (exportProperties)
             {
                 // get the extras for this element
-                glTFExtras extras = new glTFExtras();
+                var extras = new glTFExtras();
                 extras.UniqueId = elem.UniqueId;
 
                 //var properties = Util.GetElementProperties(elem, true);
@@ -634,24 +600,24 @@ namespace glTFRevitExport
                 this.extras = extras;
             }
 
-            Debug.WriteLine(String.Format("{0}    Exported Properties", heirarchyFormat));
+            Debug.WriteLine(string.Format("{0}    Exported Properties", heirarchyFormat));
         }
 
         public Node(int index)
         {
-            this.name = "::rootNode::";
-            this.id = System.Guid.NewGuid().ToString();
+            name = "::rootNode::";
+            id = Guid.NewGuid().ToString();
             this.index = index;
         }
 
         public glTFNode ToGLTFNode()
         {
-            glTFNode node = new glTFNode();
-            node.name = this.name;
-            node.mesh = this.mesh;
-            node.matrix = this.matrix;
-            node.extras = this.extras;
-            node.children = this.children;
+            var node = new glTFNode();
+            node.name = name;
+            node.mesh = mesh;
+            node.matrix = matrix;
+            node.extras = extras;
+            node.children = children;
             return node;
         }
     }

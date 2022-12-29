@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Reflection;
-using System.Windows.Media;
 using Autodesk.Revit.UI;
 
 namespace ASRR.Revit.Core.UI.RibbonPanelItemCreator
 {
     public class PushButtonRibbonPanelItemCreator<T> : IRibbonPanelItemCreator where T : IExternalCommand
     {
-        private readonly string _title;
         private readonly ImageSource _imageSource;
+        private readonly string _title;
 
         public PushButtonRibbonPanelItemCreator(string title, ImageSource imageSource)
         {

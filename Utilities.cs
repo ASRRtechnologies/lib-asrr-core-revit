@@ -1,11 +1,10 @@
-﻿using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
+﻿using System;
 using System.Collections.Generic;
-using System;
-using System.Linq;
-using Autodesk.Revit.ApplicationServices;
 using System.IO;
+using System.Linq;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI;
 using NLog;
 
 namespace ASRR.Revit.Core.Elements
@@ -22,13 +21,11 @@ namespace ASRR.Revit.Core.Elements
 
             var uiviews = uidoc.GetOpenUIViews();
             foreach (var uv in uiviews)
-            {
                 if (uv.ViewId.Equals(view.Id))
                 {
                     uiView = uv;
                     break;
                 }
-            }
 
             if (uiView == null)
                 return;
@@ -48,11 +45,9 @@ namespace ASRR.Revit.Core.Elements
             var collector = new FilteredElementCollector(doc).OfClass(typeof(View3D));
 
             foreach (View3D v in collector)
-            {
                 // Skip view template here because view templates are invisible in project browser
                 if (!v.IsTemplate)
                     return v;
-            }
 
             return null;
         }
@@ -84,7 +79,6 @@ namespace ASRR.Revit.Core.Elements
         {
             var parameter = element.LookupParameter(parameterName);
             if (parameter != null)
-            {
                 try
                 {
                     switch (parameter.StorageType)
@@ -102,14 +96,11 @@ namespace ASRR.Revit.Core.Elements
                         case StorageType.ElementId:
                             parameter.Set(new ElementId(value));
                             return true;
-                        default:
-                            break;
                     }
                 }
                 catch
                 {
                 }
-            }
 
             return false;
         }
@@ -122,10 +113,8 @@ namespace ASRR.Revit.Core.Elements
             var line = Line.CreateBound(start, end);
 
             if (null == line)
-            {
                 throw new Exception(
                     "Geometry line creation failed.");
-            }
 
             doc.Create.NewModelCurve(line, NewSketchPlanePassLine());
 
@@ -167,35 +156,35 @@ namespace ASRR.Revit.Core.Elements
 
         public static List<T> GetAllOfType<T>(Document doc) where T : class
         {
-            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            var collector = new FilteredElementCollector(doc);
             return collector.OfClass(typeof(T)).Select(e => e as T).ToList();
         }
 
         public static T GetFirstOfType<T>(Document doc) where T : class
         {
-            return GetAllOfType<T>(doc).FirstOrDefault() as T;
+            return GetAllOfType<T>(doc).FirstOrDefault();
         }
 
         public static T FindElementByName<T>(Document doc, string elementName) where T : class
         {
-            List<T> allElements = GetAllOfType<T>(doc);
+            var allElements = GetAllOfType<T>(doc);
 
-            T element = allElements.FirstOrDefault(e => (e as Element).Name == elementName);
+            var element = allElements.FirstOrDefault(e => (e as Element).Name == elementName);
 
             return element;
         }
 
         public static List<T> FindElementsByName<T>(Document doc, IEnumerable<string> elementNames) where T : class
         {
-            List<T> result = new List<T>();
+            var result = new List<T>();
 
             if (elementNames == null)
                 return result;
 
-            List<T> allElements = GetAllOfType<T>(doc);
-            foreach (string elementName in elementNames)
+            var allElements = GetAllOfType<T>(doc);
+            foreach (var elementName in elementNames)
             {
-                T element = allElements.FirstOrDefault(e => (e as Element).Name == elementName);
+                var element = allElements.FirstOrDefault(e => (e as Element).Name == elementName);
                 if (element == null)
                 {
                     _log.Error($"Could not find element with name '{elementName}'");
@@ -211,10 +200,10 @@ namespace ASRR.Revit.Core.Elements
         //Saves and closes, as well as removes annoying back-up files
         public static void SaveAndCloseDocument(Document doc, string destinationFilePath, bool overwrite = true)
         {
-            string destinationDirectory = Path.GetDirectoryName(destinationFilePath);
+            var destinationDirectory = Path.GetDirectoryName(destinationFilePath);
             Directory.CreateDirectory(destinationDirectory);
 
-            SaveAsOptions saveAsOptions = new SaveAsOptions {OverwriteExistingFile = overwrite};
+            var saveAsOptions = new SaveAsOptions {OverwriteExistingFile = overwrite};
             doc.SaveAs(destinationFilePath, saveAsOptions);
             doc.Close();
 
@@ -222,13 +211,13 @@ namespace ASRR.Revit.Core.Elements
         }
 
         /// <summary>
-        /// Opens a Revit file and sets the main 3d view as the active view, with the visual style set to "Shaded"
+        ///     Opens a Revit file and sets the main 3d view as the active view, with the visual style set to "Shaded"
         /// </summary>
         public static void OpenDocumentIntoShaded3DView(UIApplication uiApp, string filePath)
         {
-            UIDocument uiDoc = uiApp.OpenAndActivateDocument(filePath);
-            Document doc = uiDoc.Document;
-            View3D view = GetFirstOfType<View3D>(doc);
+            var uiDoc = uiApp.OpenAndActivateDocument(filePath);
+            var doc = uiDoc.Document;
+            var view = GetFirstOfType<View3D>(doc);
 
             if (view == null)
                 return;
@@ -236,12 +225,12 @@ namespace ASRR.Revit.Core.Elements
             //These UI commands must happen outside of a transaction
             uiDoc.ActiveView = view;
             //Close the view that opened when this document started if it's not the 3d view
-            IList<UIView> openViews = uiDoc.GetOpenUIViews();
-            foreach (UIView uiView in openViews)
+            var openViews = uiDoc.GetOpenUIViews();
+            foreach (var uiView in openViews)
                 if (uiView.ViewId != view.Id)
                     uiView.Close();
 
-            using (Transaction transaction = new Transaction(doc))
+            using (var transaction = new Transaction(doc))
             {
                 transaction.Start("Set view graphics to Shaded");
                 view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(3); //3 = Shaded
@@ -252,14 +241,10 @@ namespace ASRR.Revit.Core.Elements
         public static void RemoveBackUpFilesFromDirectory(string directory)
         {
             //Remove annoying backup files
-            foreach (string file in Directory.GetFiles(directory))
-            {
-                for (int i = 1; i < 10; i++)
-                {
+            foreach (var file in Directory.GetFiles(directory))
+                for (var i = 1; i < 10; i++)
                     if (file.EndsWith($".000{i}.rvt"))
                         File.Delete(file);
-                }
-            }
         }
 
         public static string WriteXyz(XYZ vector)
@@ -269,7 +254,7 @@ namespace ASRR.Revit.Core.Elements
 
         public static CopyPasteOptions UseDestinationOnDuplicateNameCopyPasteOptions()
         {
-            CopyPasteOptions copyOptions = new CopyPasteOptions();
+            var copyOptions = new CopyPasteOptions();
             copyOptions.SetDuplicateTypeNamesHandler(new UseDestinationHandler());
             return copyOptions;
         }

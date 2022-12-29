@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace ASRR.Revit.Core.Exporter.GLTF.Model
 {
     /// <summary>
-    /// Magic numbers to differentiate scalar and vector 
-    /// array buffers.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
+    ///     Magic numbers to differentiate scalar and vector
+    ///     array buffers.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
     /// </summary>
     public enum Targets
     {
@@ -15,9 +15,9 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// Magic numbers to differentiate array buffer component
-    /// types.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessor-element-size
+    ///     Magic numbers to differentiate array buffer component
+    ///     types.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessor-element-size
     /// </summary>
     public enum ComponentType
     {
@@ -36,8 +36,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// The json serializable glTF file format.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0
+    ///     The json serializable glTF file format.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0
     /// </summary>
     public struct glTF
     {
@@ -52,8 +52,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// A binary data store serialized to a *.bin file
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#binary-data-storage
+    ///     A binary data store serialized to a *.bin file
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#binary-data-storage
     /// </summary>
     public class glTFBinaryData : HashedType
     {
@@ -79,8 +79,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// Required glTF asset information
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#asset
+    ///     Required glTF asset information
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#asset
     /// </summary>
     public class glTFVersion
     {
@@ -88,8 +88,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// The scenes available to render.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#scenes
+    ///     The scenes available to render.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#scenes
     /// </summary>
     public class glTFScene
     {
@@ -97,33 +97,33 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// The nodes defining individual (or nested) elements in the scene.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#nodes-and-hierarchy
+    ///     The nodes defining individual (or nested) elements in the scene.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#nodes-and-hierarchy
     /// </summary>
     public class glTFNode
     {
         /// <summary>
-        /// The user-defined name of this object
+        ///     The user-defined name of this object
         /// </summary>
         public string name { get; set; }
 
         /// <summary>
-        /// The index of the mesh in this node.
+        ///     The index of the mesh in this node.
         /// </summary>
         public int? mesh { get; set; } = null;
 
         /// <summary>
-        /// A floating-point 4x4 transformation matrix stored in column major order.
+        ///     A floating-point 4x4 transformation matrix stored in column major order.
         /// </summary>
         public List<double> matrix { get; set; }
 
         /// <summary>
-        /// The indices of this node's children.
+        ///     The indices of this node's children.
         /// </summary>
         public List<int> children { get; set; }
 
         /// <summary>
-        /// The extras describing this node.
+        ///     The extras describing this node.
         /// </summary>
         public glTFExtras extras { get; set; }
     }
@@ -140,8 +140,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// The array of primitives defining the mesh of an object.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
+    ///     The array of primitives defining the mesh of an object.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
     /// </summary>
     [Serializable]
     public class glTFMesh
@@ -150,8 +150,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// Properties defining where the GPU should look to find the mesh and material data.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
+    ///     Properties defining where the GPU should look to find the mesh and material data.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
     /// </summary>
     [Serializable]
     public class glTFMeshPrimitive
@@ -163,8 +163,8 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// The glTF PBR Material format.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materials
+    ///     The glTF PBR Material format.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materials
     /// </summary>
     public class glTFMaterial
     {
@@ -180,111 +180,111 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     }
 
     /// <summary>
-    /// The list of accessors available to the renderer for a particular mesh.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
+    ///     The list of accessors available to the renderer for a particular mesh.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
     /// </summary>
     [Serializable]
     public class glTFAttribute
     {
         /// <summary>
-        /// The index of the accessor for position data.
+        ///     The index of the accessor for position data.
         /// </summary>
         public int POSITION { get; set; }
         //public int NORMAL { get; set; }
     }
 
     /// <summary>
-    /// A reference to the location and size of binary data.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
+    ///     A reference to the location and size of binary data.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
     /// </summary>
     public class glTFBuffer
     {
         /// <summary>
-        /// The uri of the buffer.
+        ///     The uri of the buffer.
         /// </summary>
         public string uri { get; set; }
 
         /// <summary>
-        /// The total byte length of the buffer.
+        ///     The total byte length of the buffer.
         /// </summary>
         public int byteLength { get; set; }
     }
 
     /// <summary>
-    /// A reference to a subsection of a buffer containing either vector or scalar data.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
+    ///     A reference to a subsection of a buffer containing either vector or scalar data.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
     /// </summary>
     public class glTFBufferView
     {
         /// <summary>
-        /// The index of the buffer.
+        ///     The index of the buffer.
         /// </summary>
         public int buffer { get; set; }
 
         /// <summary>
-        /// The offset into the buffer in bytes.
+        ///     The offset into the buffer in bytes.
         /// </summary>
         public int byteOffset { get; set; }
 
         /// <summary>
-        /// The length of the bufferView in bytes.
+        ///     The length of the bufferView in bytes.
         /// </summary>
         public int byteLength { get; set; }
 
         /// <summary>
-        /// The target that the GPU buffer should be bound to.
+        ///     The target that the GPU buffer should be bound to.
         /// </summary>
         public Targets target { get; set; }
 
         /// <summary>
-        /// A user defined name for this view.
+        ///     A user defined name for this view.
         /// </summary>
         public string name { get; set; }
     }
 
     /// <summary>
-    /// A reference to a subsection of a BufferView containing a particular data type.
-    /// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessors
+    ///     A reference to a subsection of a BufferView containing a particular data type.
+    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessors
     /// </summary>
     public class glTFAccessor
     {
         /// <summary>
-        /// The index of the bufferView.
+        ///     The index of the bufferView.
         /// </summary>
         public int bufferView { get; set; }
 
         /// <summary>
-        /// The offset relative to the start of the bufferView in bytes.
+        ///     The offset relative to the start of the bufferView in bytes.
         /// </summary>
         public int byteOffset { get; set; }
 
         /// <summary>
-        /// the datatype of the components in the attribute
+        ///     the datatype of the components in the attribute
         /// </summary>
         public ComponentType componentType { get; set; }
 
         /// <summary>
-        /// The number of attributes referenced by this accessor.
+        ///     The number of attributes referenced by this accessor.
         /// </summary>
         public int count { get; set; }
 
         /// <summary>
-        /// Specifies if the attribute is a scalar, vector, or matrix
+        ///     Specifies if the attribute is a scalar, vector, or matrix
         /// </summary>
         public string type { get; set; }
 
         /// <summary>
-        /// Maximum value of each component in this attribute.
+        ///     Maximum value of each component in this attribute.
         /// </summary>
         public List<float> max { get; set; }
 
         /// <summary>
-        /// Minimum value of each component in this attribute.
+        ///     Minimum value of each component in this attribute.
         /// </summary>
         public List<float> min { get; set; }
 
         /// <summary>
-        /// A user defined name for this accessor.
+        ///     A user defined name for this accessor.
         /// </summary>
         public string name { get; set; }
     }
@@ -292,7 +292,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
     public class glTFExtras
     {
         /// <summary>
-        /// The Revit created UniqueId for this object
+        ///     The Revit created UniqueId for this object
         /// </summary>
         public string UniqueId { get; set; }
 

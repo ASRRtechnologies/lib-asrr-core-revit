@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using Autodesk.Revit.DB;
 
 namespace ASRR.Revit.Core.Elements.Families
 {
@@ -9,10 +10,7 @@ namespace ASRR.Revit.Core.Elements.Families
             var familyInstance = element as FamilyInstance;
             var family = familyInstance?.Symbol?.Family;
 
-            if (family == null && !silentFail)
-            {
-                throw new System.Exception("Could not get family from element");
-            }
+            if (family == null && !silentFail) throw new Exception("Could not get family from element");
 
             return family;
         }
@@ -22,10 +20,7 @@ namespace ASRR.Revit.Core.Elements.Families
             var familyInstance = element as FamilyInstance;
             var familySymbol = familyInstance?.Symbol;
 
-            if (familySymbol == null && !silentFail)
-            {
-                throw new System.Exception("Could not get family symbol from element");
-            }
+            if (familySymbol == null && !silentFail) throw new Exception("Could not get family symbol from element");
 
             return familySymbol;
         }

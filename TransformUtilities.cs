@@ -1,7 +1,6 @@
 ﻿using ASRR.Revit.Core.Elements.Placement;
 using ASRR.Revit.Core.Model;
 using Autodesk.Revit.DB;
-using Form.Revit.Common;
 using NLog;
 
 namespace ASRR.Revit.Core
@@ -12,19 +11,19 @@ namespace ASRR.Revit.Core
 
         public static IPosition GetPosition(Element element)
         {
-            LocationPoint locationPoint = element.Location as LocationPoint;
-            XYZ xyz = locationPoint.Point;
+            var locationPoint = element.Location as LocationPoint;
+            var xyz = locationPoint.Point;
             return new FeetPosition(xyz);
         }
 
         /// <summary>
-        ///Moves element to the given position
+        ///     Moves element to the given position
         /// </summary>
         /// <param name="ignoreZ"> Allows to ignore Z (up/down) to avoid moving elements vertically</param>
         /// <returns></returns>
         public static bool SetPosition(Element element, IPosition position, bool ignoreZ = true)
         {
-            Location location = element?.Location;
+            var location = element?.Location;
             if (location == null)
             {
                 _logger.Error("Could not set rotation because element or location is null");
@@ -37,9 +36,9 @@ namespace ASRR.Revit.Core
                 return false;
             }
 
-            double z = ignoreZ ? 0 : position.PositionInFeet.Z - locationPoint.Point.Z;
+            var z = ignoreZ ? 0 : position.PositionInFeet.Z - locationPoint.Point.Z;
 
-            XYZ positionOffset = new XYZ(
+            var positionOffset = new XYZ(
                 position.PositionInFeet.X - locationPoint.Point.X,
                 position.PositionInFeet.Y - locationPoint.Point.Y,
                 z);
@@ -50,11 +49,11 @@ namespace ASRR.Revit.Core
         }
 
         /// <summary>
-        /// Moves element by the given offset
+        ///     Moves element by the given offset
         /// </summary>
         public static bool Move(Element element, IPosition positionOffset)
         {
-            Location location = element?.Location;
+            var location = element?.Location;
             if (location == null)
             {
                 _logger.Error("Could not set rotation because element or location is null");
@@ -67,18 +66,18 @@ namespace ASRR.Revit.Core
 
         public static IRotation GetRotation(Element element)
         {
-            LocationPoint locationPoint = element.Location as LocationPoint;
-            double rotationInRadians = locationPoint.Rotation;
+            var locationPoint = element.Location as LocationPoint;
+            var rotationInRadians = locationPoint.Rotation;
 
             return new RadianRotation(rotationInRadians);
         }
 
         /// <summary>
-        /// Exactly set the rotation to the given rotation
+        ///     Exactly set the rotation to the given rotation
         /// </summary>
         public static bool SetRotation(Element element, IRotation rotation)
         {
-            Location location = element?.Location;
+            var location = element?.Location;
             if (location == null)
             {
                 _logger.Error("Could not set rotation because element or location is null");
@@ -92,18 +91,18 @@ namespace ASRR.Revit.Core
             }
 
             //Find out how much we need to rotate by to get to the desired rotation
-            RadianRotation rotationOffset = new RadianRotation(rotation.RotationInRadians - locationPoint.Rotation);
+            var rotationOffset = new RadianRotation(rotation.RotationInRadians - locationPoint.Rotation);
             Rotate(element, rotationOffset);
 
             return true;
         }
 
         /// <summary>
-        /// Rotates element by the given rotation
+        ///     Rotates element by the given rotation
         /// </summary>
         public static bool Rotate(Element element, IRotation rotation)
         {
-            Location location = element?.Location;
+            var location = element?.Location;
             if (location == null)
             {
                 _logger.Error("Could not rotate because element or location is null");
@@ -125,11 +124,11 @@ namespace ASRR.Revit.Core
         }
 
         /// <summary>
-        /// Rotates element by the given rotation around the origin point of its document
+        ///     Rotates element by the given rotation around the origin point of its document
         /// </summary>
         public static bool RotateGlobal(Element element, IRotation rotation)
         {
-            Location location = element?.Location;
+            var location = element?.Location;
             if (location == null)
             {
                 _logger.Error("Could not rotate because element or location is null");
@@ -144,11 +143,11 @@ namespace ASRR.Revit.Core
         }
 
         /// <summary>
-        /// Adds two positions together and returns the result
+        ///     Adds two positions together and returns the result
         /// </summary>
         public static IPosition AddPositions(IPosition a, IPosition b)
         {
-            XYZ xyz = a.PositionInMillimeters + b.PositionInMillimeters;
+            var xyz = a.PositionInMillimeters + b.PositionInMillimeters;
             return new MillimeterPosition(xyz);
         }
     }

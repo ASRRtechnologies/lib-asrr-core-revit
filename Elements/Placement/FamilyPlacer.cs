@@ -10,14 +10,14 @@ using ParameterUtils = ASRR.Revit.Core.Elements.Parameters.ParameterUtils;
 namespace ASRR.Revit.Core.Elements.Placement
 {
     /// <summary>
-    /// Class to interact with families
+    ///     Class to interact with families
     /// </summary>
     public class FamilyPlacer
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// This method places a family based on reference plane, location and referenceDirection
+        ///     This method places a family based on reference plane, location and referenceDirection
         /// </summary>
         public void Place(Document doc,
             XYZ location,
@@ -46,7 +46,7 @@ namespace ASRR.Revit.Core.Elements.Placement
 
                 if (mirrored)
                 {
-                    Log.Info($"Mirroring element");
+                    Log.Info("Mirroring element");
                     using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, location)) // ZX
                     {
                         ElementTransformUtils.MirrorElements(doc, new[] {newFamilyInstance.Id}, plane, false);
@@ -61,7 +61,7 @@ namespace ASRR.Revit.Core.Elements.Placement
 
 
         /// <summary>
-        /// This method places a family based on curve (line based elements)
+        ///     This method places a family based on curve (line based elements)
         /// </summary>
         public void Place(Document doc,
             Curve curve,
@@ -83,7 +83,7 @@ namespace ASRR.Revit.Core.Elements.Placement
 
                 if (mirrored)
                 {
-                    Log.Info($"Mirroring element");
+                    Log.Info("Mirroring element");
                     using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, curve.GetEndPoint(0))) // ZX
                     {
                         ElementTransformUtils.MirrorElements(doc, new[] {newFamilyInstance.Id}, plane, false);

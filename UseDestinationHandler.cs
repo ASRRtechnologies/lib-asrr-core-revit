@@ -8,7 +8,7 @@ namespace ASRR.Revit.Core.Elements
         {
             get
             {
-                CopyPasteOptions copyPasteOptions = new CopyPasteOptions();
+                var copyPasteOptions = new CopyPasteOptions();
                 copyPasteOptions.SetDuplicateTypeNamesHandler(new UseDestinationHandler());
                 return copyPasteOptions;
             }

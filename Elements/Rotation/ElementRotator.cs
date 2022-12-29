@@ -35,7 +35,7 @@ namespace ASRR.Revit.Core.Elements.Rotation
 
         private static double ConvertToRadians(double angle)
         {
-            return (Math.PI / 180) * angle;
+            return Math.PI / 180 * angle;
         }
     }
 }

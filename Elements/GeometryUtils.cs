@@ -1,7 +1,7 @@
-﻿using Autodesk.Revit.DB;
-using System;
-using ASRR.Revit.Core.Elements.Placement;
+﻿using System;
 using System.Collections.Generic;
+using ASRR.Revit.Core.Elements.Placement;
+using Autodesk.Revit.DB;
 
 namespace ASRR.Revit.Core.Elements
 {
@@ -19,7 +19,7 @@ namespace ASRR.Revit.Core.Elements
             var bb = face.GetBoundingBox();
             var half = (bb.Max - bb.Min) / 2;
 
-            return face.Origin + (face.XVector * half.U) + (face.YVector * half.V);
+            return face.Origin + face.XVector * half.U + face.YVector * half.V;
         }
 
         public static XYZ GetOrientation(Wall wall)
@@ -49,10 +49,9 @@ namespace ASRR.Revit.Core.Elements
         {
             if (curveLoopA.GetExactLength() > curveLoopB.GetExactLength())
                 return 1;
-            else if (Math.Abs(curveLoopA.GetExactLength() - curveLoopB.GetExactLength()) < TOLERANCE)
+            if (Math.Abs(curveLoopA.GetExactLength() - curveLoopB.GetExactLength()) < TOLERANCE)
                 return 0;
-            else
-                return -1;
+            return -1;
         }
 
         public static XYZ GetWallCenter(Wall wall)
@@ -86,7 +85,7 @@ namespace ASRR.Revit.Core.Elements
             xyzQ11Feet.Add(new XYZ(0, 0, CoordinateUtilities.ConvertMmToFeet(1500)));
             xyzQ33Feet.Add(new XYZ(0, 0, CoordinateUtilities.ConvertMmToFeet(1500)));
 
-            return new List<XYZ>() {xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet};
+            return new List<XYZ> {xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet};
         }
     }
 }

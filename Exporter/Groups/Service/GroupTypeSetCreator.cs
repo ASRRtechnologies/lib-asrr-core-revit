@@ -8,19 +8,22 @@ using Autodesk.Revit.DB;
 namespace ASRR.Revit.Core.Exporter.Groups.Service
 {
     /// <summary>
-    /// Creates a grouptypeset dto from a given modelgroup
+    ///     Creates a grouptypeset dto from a given modelgroup
     /// </summary>
     public class GroupTypeSetCreator
     {
         /// <param name="doc"></param>
         /// <param name="modelGroup"></param>
-        /// <param name="includeOffset">Indicates whether the offset of the group relative to the origin of the document should be accounted for</param>
+        /// <param name="includeOffset">
+        ///     Indicates whether the offset of the group relative to the origin of the document should be
+        ///     accounted for
+        /// </param>
         /// <returns></returns>
         public GroupTypeSet Create(Document doc, Group modelGroup, bool includeOffset)
         {
-            List<AttachedDetailGroupType> detailGroupTypes = GetAttachedDetailGroupTypes(doc, modelGroup);
+            var detailGroupTypes = GetAttachedDetailGroupTypes(doc, modelGroup);
 
-            GroupTypeSet groupTypeSet = new GroupTypeSet
+            var groupTypeSet = new GroupTypeSet
             {
                 ModelGroupType = modelGroup.GroupType,
                 PositionOffset = CreatePosition(modelGroup, includeOffset),
@@ -32,7 +35,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
         private static IPosition CreatePosition(Group modelGroup, bool includeOffset)
         {
-            IPosition position = TransformUtilities.GetPosition(modelGroup);
+            var position = TransformUtilities.GetPosition(modelGroup);
 
             if (!includeOffset)
                 return new MillimeterPosition(new XYZ(0, 0, position.PositionInMillimeters.Z));
@@ -42,15 +45,15 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
         private List<AttachedDetailGroupType> GetAttachedDetailGroupTypes(Document doc, Group modelGroup)
         {
-            List<AttachedDetailGroupType> detailGroupTypes = new List<AttachedDetailGroupType>();
-            List<Group> detailGroups = FindAttachedDetailGroups(doc, modelGroup);
-            List<ViewPlan> allFloorPlans = Utilities.GetAllOfType<ViewPlan>(doc)
+            var detailGroupTypes = new List<AttachedDetailGroupType>();
+            var detailGroups = FindAttachedDetailGroups(doc, modelGroup);
+            var allFloorPlans = Utilities.GetAllOfType<ViewPlan>(doc)
                 .Where(v => v.ViewType == ViewType.FloorPlan).ToList();
 
-            foreach (Group detailGroup in detailGroups)
+            foreach (var detailGroup in detailGroups)
             {
-                ElementId ownerViewId = detailGroup.OwnerViewId;
-                ViewPlan ownerFloorPlan = allFloorPlans.FirstOrDefault(floorplan => floorplan.Id == ownerViewId);
+                var ownerViewId = detailGroup.OwnerViewId;
+                var ownerFloorPlan = allFloorPlans.FirstOrDefault(floorplan => floorplan.Id == ownerViewId);
 
                 if (ownerFloorPlan != null)
                     detailGroupTypes.Add(new AttachedDetailGroupType
@@ -74,7 +77,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
         private bool HasGroupAsParent(Element detailGroup, Element modelGroup)
         {
-            Parameter groupNameParameter = detailGroup.get_Parameter(BuiltInParameter.GROUP_ATTACHED_PARENT_NAME);
+            var groupNameParameter = detailGroup.get_Parameter(BuiltInParameter.GROUP_ATTACHED_PARENT_NAME);
             if (groupNameParameter == null)
                 return false;
 

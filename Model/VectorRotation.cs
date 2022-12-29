@@ -1,18 +1,18 @@
-﻿using Autodesk.Revit.DB;
-using System;
+﻿using System;
 using ASRR.Revit.Core.Elements.Placement;
 using ASRR.Revit.Core.Model;
+using Autodesk.Revit.DB;
 
 namespace Form.Revit.Common
 {
     public class VectorRotation : IRotation
     {
-        public XYZ RotationVector { get; set; }
-
         public VectorRotation(XYZ rotationVector)
         {
             RotationVector = rotationVector;
         }
+
+        public XYZ RotationVector { get; set; }
 
         public double RotationInRadians => RotationVector.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ.Negate());
 

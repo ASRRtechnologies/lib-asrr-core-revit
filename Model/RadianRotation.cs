@@ -5,12 +5,12 @@ namespace ASRR.Revit.Core.Model
 {
     public class RadianRotation : IRotation
     {
-        public double Rotation { get; set; }
-
         public RadianRotation(double rotation)
         {
             Rotation = rotation;
         }
+
+        public double Rotation { get; set; }
 
         public double RotationInRadians => Rotation;
 

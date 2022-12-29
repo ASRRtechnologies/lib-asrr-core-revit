@@ -4,13 +4,13 @@ using System.Collections.Generic;
 namespace ASRR.Revit.Core.Exporter.GLTF.Model
 {
     /// <summary>
-    /// Container for holding a strict set of items
-    /// that is also addressable by a unique ID.
+    ///     Container for holding a strict set of items
+    ///     that is also addressable by a unique ID.
     /// </summary>
     /// <typeparam name="T">The type of item contained.</typeparam>
     public class IndexedDictionary<T>
     {
-        private Dictionary<string, int> _dict = new Dictionary<string, int>();
+        private readonly Dictionary<string, int> _dict = new Dictionary<string, int>();
         public List<T> List { get; } = new List<T>();
         public string CurrentKey { get; private set; }
 
@@ -19,34 +19,25 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
             get
             {
                 var output = new Dictionary<string, T>();
-                foreach (var kvp in _dict)
-                {
-                    output.Add(kvp.Key, List[kvp.Value]);
-                }
+                foreach (var kvp in _dict) output.Add(kvp.Key, List[kvp.Value]);
 
                 return output;
             }
         }
 
         /// <summary>
-        /// The most recently accessed item (not effected by GetElement()).
+        ///     The most recently accessed item (not effected by GetElement()).
         /// </summary>
-        public T CurrentItem
-        {
-            get { return List[_dict[CurrentKey]]; }
-        }
+        public T CurrentItem => List[_dict[CurrentKey]];
 
         /// <summary>
-        /// The index of the most recently accessed item (not effected by GetElement()).
+        ///     The index of the most recently accessed item (not effected by GetElement()).
         /// </summary>
-        public int CurrentIndex
-        {
-            get { return _dict[CurrentKey]; }
-        }
+        public int CurrentIndex => _dict[CurrentKey];
 
         /// <summary>
-        /// Add a new item to the list, if it already exists then the 
-        /// current item will be set to this item.
+        ///     Add a new item to the list, if it already exists then the
+        ///     current item will be set to this item.
         /// </summary>
         /// <param name="uuid">Unique identifier for the item.</param>
         /// <param name="elem">The item to add.</param>
@@ -56,7 +47,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
             if (!_dict.ContainsKey(uuid))
             {
                 List.Add(elem);
-                _dict.Add(uuid, (List.Count - 1));
+                _dict.Add(uuid, List.Count - 1);
                 CurrentKey = uuid;
                 return true;
             }
@@ -66,7 +57,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// Check if the container already has an item with this key.
+        ///     Check if the container already has an item with this key.
         /// </summary>
         /// <param name="uuid">Unique identifier for the item.</param>
         /// <returns></returns>
@@ -76,7 +67,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// Returns the index for an item given it's unique identifier.
+        ///     Returns the index for an item given it's unique identifier.
         /// </summary>
         /// <param name="uuid">Unique identifier for the item.</param>
         /// <returns>index of item or -1</returns>
@@ -87,18 +78,18 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         }
 
         /// <summary>
-        /// Returns an item given it's unique identifier.
+        ///     Returns an item given it's unique identifier.
         /// </summary>
         /// <param name="uuid">Unique identifier for the item</param>
         /// <returns>the item</returns>
         public T GetElement(string uuid)
         {
-            int index = GetIndexFromUUID(uuid);
+            var index = GetIndexFromUUID(uuid);
             return List[index];
         }
 
         /// <summary>
-        /// Returns as item given it's index location.
+        ///     Returns as item given it's index location.
         /// </summary>
         /// <param name="index">The item's index location.</param>
         /// <returns>the item</returns>
