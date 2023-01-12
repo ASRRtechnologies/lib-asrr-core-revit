@@ -7,7 +7,7 @@ namespace ASRR.Revit.Core
         // todo: maak static class om png te exporten
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-        public static void ExportPNG(string exportPath)
+        public static void ExportPng(string exportPath)
         {
             Log.Info("Exporting PNG");
         }
