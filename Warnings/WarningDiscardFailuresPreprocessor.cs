@@ -23,11 +23,10 @@ namespace ASRR.Revit.Core.Warnings
                 var failureSeverity = failuresAccessor.GetSeverity();
 
                 //Simply eat all warnings
-                if (failureSeverity == FailureSeverity.Warning)
-                {
-                    _logger?.Warn($"'{failure.GetDescriptionText()}'");
-                    failuresAccessor.DeleteWarning(failure);
-                }
+                if (failureSeverity != FailureSeverity.Warning) continue;
+                
+                _logger?.Warn($"'{failure.GetDescriptionText()}'");
+                failuresAccessor.DeleteWarning(failure);
             }
 
             return FailureProcessingResult.Continue;
