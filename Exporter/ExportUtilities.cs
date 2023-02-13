@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using ASRR.Revit.Core.Elements;
 using Autodesk.Revit.DB;
 using NLog;
@@ -28,6 +29,10 @@ namespace ASRR.Revit.Core.Exporter
             opt.SetViewsAndSheets(ids);
             document.ExportImage(opt);
 
+            if (File.Exists(exportPath))
+            {
+                File.Delete(exportPath);
+            }
 
             System.IO.File.Move(
                     exportPath.Replace(".png", "") + " - 3D View - {3D}.png",

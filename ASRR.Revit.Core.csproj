@@ -1,109 +1,110 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{60AC09BD-DB0E-40A9-B8A7-B0D40E7042E6}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>ASRR.Revit.Core</RootNamespace>
-        <AssemblyName>ASRR.Revit.Core</AssemblyName>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-        <Deterministic>true</Deterministic>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="PresentationCore"/>
-        <Reference Include="System"/>
-        <Reference Include="System.Configuration"/>
-        <Reference Include="System.Core"/>
-        <Reference Include="System.IO.Compression"/>
-        <Reference Include="System.Runtime.Serialization"/>
-        <Reference Include="System.ServiceModel"/>
-        <Reference Include="System.Transactions"/>
-        <Reference Include="System.Xml.Linq"/>
-        <Reference Include="System.Data.DataSetExtensions"/>
-        <Reference Include="Microsoft.CSharp"/>
-        <Reference Include="System.Data"/>
-        <Reference Include="System.Net.Http"/>
-        <Reference Include="System.Xml"/>
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Include="Elements\Families\FamilyUtils.cs"/>
-        <Compile Include="Elements\GeometryUtils.cs"/>
-        <Compile Include="Elements\Parameters\Dto\BaseRevitParameter.cs"/>
-        <Compile Include="Elements\Parameters\Dto\RevitParameter.cs"/>
-        <Compile Include="Elements\Parameters\ParameterApplier.cs"/>
-        <Compile Include="Elements\Placement\CoordinateUtilities.cs"/>
-        <Compile Include="Elements\Placement\FamilyPlacer.cs"/>
-        <Compile Include="Elements\Rotation\ElementRotator.cs"/>
-        <Compile Include="Exporter\ExportUtilities.cs"/>
-        <Compile Include="Exporter\GLTF\Model\VertexLookupInt.cs"/>
-        <Compile Include="Exporter\GLTF\Model\GeometryData.cs"/>
-        <Compile Include="Exporter\GLTF\Model\GLTF.cs"/>
-        <Compile Include="Exporter\GLTF\Model\GltfExportContext.cs"/>
-        <Compile Include="Exporter\GLTF\Model\IndexedDictionary.cs"/>
-        <Compile Include="Exporter\GLTF\Model\PointInt.cs"/>
-        <Compile Include="Exporter\GLTF\Service\GTLFManager.cs"/>
-        <Compile Include="Exporter\GLTF\Service\Util.cs"/>
-        <Compile Include="Exporter\Groups\Model\AttachedDetailGroupType.cs"/>
-        <Compile Include="Exporter\Groups\Model\GroupTypeSet.cs"/>
-        <Compile Include="Exporter\Groups\Service\GroupTypeCopyPaster.cs"/>
-        <Compile Include="Exporter\Groups\Service\GroupTypeSetCreator.cs"/>
-        <Compile Include="Model\DegreeRotation.cs"/>
-        <Compile Include="Model\RadianRotation.cs"/>
-        <Compile Include="Model\VectorRotation.cs"/>
-        <Compile Include="UseDestinationHandler.cs"/>
-        <Compile Include="Utilities.cs"/>
-        <Compile Include="Model\IPosition.cs"/>
-        <Compile Include="Model\IRotation.cs"/>
-        <Compile Include="Model\FeetPosition.cs"/>
-        <Compile Include="Model\MillimeterPosition.cs"/>
-        <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="TransformUtilities.cs"/>
-        <Compile Include="UI\RibbonPanelCreator\DictionaryBasedRibbonPanelCreator.cs"/>
-        <Compile Include="UI\RibbonPanelCreator\IRibbonPanelCreator.cs"/>
-        <Compile Include="UI\RibbonPanelItemCreator\IRibbonPanelItemCreator.cs"/>
-        <Compile Include="UI\RibbonPanelItemCreator\PushButtonRibbonPanelItemCreator.cs"/>
-        <Compile Include="Warnings\WarningDiscardFailuresPreprocessor.cs"/>
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Newtonsoft.Json">
-            <Version>13.0.2</Version>
-        </PackageReference>
-        <PackageReference Include="NLog">
-            <Version>5.0.5</Version>
-        </PackageReference>
-        <PackageReference Include="Revit.RevitApi.x64">
-            <Version>2023.0.0</Version>
-        </PackageReference>
-        <PackageReference Include="Revit.RevitApiUI.x64">
-            <Version>2023.0.0</Version>
-        </PackageReference>
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\lib-asrr-core\ASRR.Core.csproj">
-            <Project>{12EA4456-8CD5-43EF-80C7-D70338C8B018}</Project>
-            <Name>ASRR.Core</Name>
-        </ProjectReference>
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{60AC09BD-DB0E-40A9-B8A7-B0D40E7042E6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ASRR.Revit.Core</RootNamespace>
+    <AssemblyName>ASRR.Revit.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Elements\Families\FamilyUtils.cs" />
+    <Compile Include="Elements\GeometryUtils.cs" />
+    <Compile Include="Elements\Parameters\Dto\BaseRevitParameter.cs" />
+    <Compile Include="Elements\Parameters\Dto\RevitParameter.cs" />
+    <Compile Include="Elements\Parameters\ParameterApplier.cs" />
+    <Compile Include="Elements\Parameters\RevitBuildInParameters.cs" />
+    <Compile Include="Elements\Placement\CoordinateUtilities.cs" />
+    <Compile Include="Elements\Placement\FamilyPlacer.cs" />
+    <Compile Include="Elements\Rotation\ElementRotator.cs" />
+    <Compile Include="Exporter\ExportUtilities.cs" />
+    <Compile Include="Exporter\GLTF\Model\VertexLookupInt.cs" />
+    <Compile Include="Exporter\GLTF\Model\GeometryData.cs" />
+    <Compile Include="Exporter\GLTF\Model\GLTF.cs" />
+    <Compile Include="Exporter\GLTF\Model\GltfExportContext.cs" />
+    <Compile Include="Exporter\GLTF\Model\IndexedDictionary.cs" />
+    <Compile Include="Exporter\GLTF\Model\PointInt.cs" />
+    <Compile Include="Exporter\GLTF\Service\GTLFManager.cs" />
+    <Compile Include="Exporter\GLTF\Service\Util.cs" />
+    <Compile Include="Exporter\Groups\Model\AttachedDetailGroupType.cs" />
+    <Compile Include="Exporter\Groups\Model\GroupTypeSet.cs" />
+    <Compile Include="Exporter\Groups\Service\GroupTypeCopyPaster.cs" />
+    <Compile Include="Exporter\Groups\Service\GroupTypeSetCreator.cs" />
+    <Compile Include="Model\DegreeRotation.cs" />
+    <Compile Include="Model\RadianRotation.cs" />
+    <Compile Include="Model\VectorRotation.cs" />
+    <Compile Include="UseDestinationHandler.cs" />
+    <Compile Include="Utilities.cs" />
+    <Compile Include="Model\IPosition.cs" />
+    <Compile Include="Model\IRotation.cs" />
+    <Compile Include="Model\FeetPosition.cs" />
+    <Compile Include="Model\MillimeterPosition.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransformUtilities.cs" />
+    <Compile Include="UI\RibbonPanelCreator\DictionaryBasedRibbonPanelCreator.cs" />
+    <Compile Include="UI\RibbonPanelCreator\IRibbonPanelCreator.cs" />
+    <Compile Include="UI\RibbonPanelItemCreator\IRibbonPanelItemCreator.cs" />
+    <Compile Include="UI\RibbonPanelItemCreator\PushButtonRibbonPanelItemCreator.cs" />
+    <Compile Include="Warnings\WarningDiscardFailuresPreprocessor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="NLog">
+      <Version>5.0.5</Version>
+    </PackageReference>
+    <PackageReference Include="Revit.RevitApi.x64">
+      <Version>2023.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="Revit.RevitApiUI.x64">
+      <Version>2023.0.0</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lib-asrr-core\ASRR.Core.csproj">
+      <Project>{12EA4456-8CD5-43EF-80C7-D70338C8B018}</Project>
+      <Name>ASRR.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
