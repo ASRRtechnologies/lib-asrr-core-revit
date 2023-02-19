@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using glTFRevitExport;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -124,21 +123,21 @@ namespace ASRR.Revit.Core.Elements.Parameters.Dto
                     return "";
             }
         }
-        private static string _familyParamValueString(FamilyType t, FamilyParameter fp)
-        {
-            string value = t.AsValueString(fp);
-
-            switch (fp.StorageType)
-            {
-                case StorageType.Double:
-                    value = Util.RealString((double)t.AsDouble(fp)) + " (double)";
-                    break;
-                case StorageType.String:
-                    value = "'" + t.AsString(fp) + "' (string)";
-                    break;
-            }
-
-            return value;
-        }
+        // private static string _familyParamValueString(FamilyType t, FamilyParameter fp)
+        // {
+        //     string value = t.AsValueString(fp);
+        //
+        //     switch (fp.StorageType)
+        //     {
+        //         case StorageType.Double:
+        //             value = Util.RealString((double)t.AsDouble(fp)) + " (double)";
+        //             break;
+        //         case StorageType.String:
+        //             value = "'" + t.AsString(fp) + "' (string)";
+        //             break;
+        //     }
+        //
+        //     return value;
+        // }
     }
 }

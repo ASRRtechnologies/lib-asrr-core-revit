@@ -1,7 +1,6 @@
 ﻿using ASRR.Revit.Core.Elements.Parameters.Dto;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using glTFRevitExport;
 using NLog;
 using System;
 using System.Diagnostics;
@@ -14,42 +13,42 @@ namespace ASRR.Revit.Core.Elements.Parameters
     {
         private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-        public static string GetBuildInParameterValueString(Element e, BuiltInParameter bip)
-        {
-            Parameter p = e.get_Parameter(bip);
-
-            string s = string.Empty;
-
-            if (null != p)
-            {
-                switch (p.StorageType)
-                {
-                    case StorageType.Integer:
-                        s = p.AsInteger().ToString();
-                        break;
-
-                    case StorageType.ElementId:
-                        s = p.AsElementId().IntegerValue.ToString();
-                        break;
-
-                    case StorageType.Double:
-                        s = Util.RealString(p.AsDouble());
-                        break;
-
-                    case StorageType.String:
-                        s = string.Format("{0} ({1})",
-                          p.AsValueString(),
-                          Util.RealString(p.AsDouble()));
-                        break;
-
-                    default:
-                        s = "";
-                        break;
-                }
-                s = ", " + bip.ToString() + "=" + s;
-            }
-            return s;
-        }
+        // public static string GetBuildInParameterValueString(Element e, BuiltInParameter bip)
+        // {
+        //     Parameter p = e.get_Parameter(bip);
+        //
+        //     string s = string.Empty;
+        //
+        //     if (null != p)
+        //     {
+        //         switch (p.StorageType)
+        //         {
+        //             case StorageType.Integer:
+        //                 s = p.AsInteger().ToString();
+        //                 break;
+        //
+        //             case StorageType.ElementId:
+        //                 s = p.AsElementId().IntegerValue.ToString();
+        //                 break;
+        //
+        //             case StorageType.Double:
+        //                 s = Util.RealString(p.AsDouble());
+        //                 break;
+        //
+        //             case StorageType.String:
+        //                 s = string.Format("{0} ({1})",
+        //                   p.AsValueString(),
+        //                   Util.RealString(p.AsDouble()));
+        //                 break;
+        //
+        //             default:
+        //                 s = "";
+        //                 break;
+        //         }
+        //         s = ", " + bip.ToString() + "=" + s;
+        //     }
+        //     return s;
+        // }
 
         public static string GetAssemblyCode(Autodesk.Revit.DB.Element element)
         {
