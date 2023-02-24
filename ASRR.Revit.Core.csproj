@@ -69,6 +69,8 @@
     <Compile Include="Model\DegreeRotation.cs" />
     <Compile Include="Model\RadianRotation.cs" />
     <Compile Include="Model\VectorRotation.cs" />
+    <Compile Include="RevitModel\ModelFetcher.cs" />
+    <Compile Include="RevitModel\ModelPlacer.cs" />
     <Compile Include="UseDestinationHandler.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="Model\IPosition.cs" />
