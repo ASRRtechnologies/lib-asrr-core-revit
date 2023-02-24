@@ -1,24 +1,210 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Model
 {
-    /// <summary>
-    ///     Magic numbers to differentiate scalar and vector
-    ///     array buffers.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
-    /// </summary>
-    public enum Targets
+    public class GLTF
     {
-        ARRAY_BUFFER = 34962, // signals vertex data
-        ELEMENT_ARRAY_BUFFER = 34963 // signals index or face data
+        public List<string> extensionsUsed;
+        public List<string> extensionsRequired;
+        public glTFVersion asset;
+        public List<glTFScene> scenes;
+        public List<glTFCameras> cameras;
+        public List<glTFNode> nodes;
+        public List<glTFMesh> meshes;
+        public List<glTFAccessor> accessors;
+        public List<glTFBufferView> bufferViews;
+        public List<glTFBuffer> buffers;
+        public List<glTFMaterial> materials;
+        public List<glTFImage> images;
+        public List<glTFTexture> textures;
+        public List<glTFSampler> samplers;
+        public string toJson()
+        {
+            string jsonStr = JsonConvert.SerializeObject(this, new JsonSerializerSettings
+            {
+                //Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            return jsonStr;
+        }
     }
 
-    /// <summary>
-    ///     Magic numbers to differentiate array buffer component
-    ///     types.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessor-element-size
-    /// </summary>
+    public class GLB
+    {
+
+        public const uint Magic = 0x46546C67;
+
+        public const uint Version = 2;
+
+        public const uint HeaderLength = sizeof(uint) + sizeof(uint) + sizeof(int);
+
+        public const uint ChunkHeaderLength = sizeof(uint) + sizeof(uint);
+
+        public const uint ChunkFormatJson = 0x4E4F534A;
+
+        public const uint ChunkFormatBin = 0x004E4942;
+    }
+
+
+    public class glTFVersion
+    {
+        public string generator = "ASRR Custom Exporter";
+        public string version = "2.0";
+        public Dictionary<string, object> extras { get; set; }
+        public Dictionary<string, object> extensions { get; set; }
+    }
+
+    public class glTFScene
+    {
+        public List<int> nodes = new List<int>();
+    }
+
+
+    public class glTFNode
+    {
+
+        public string name { get; set; }
+
+        public int? mesh { get; set; } = null;
+
+        public int? camera { get; set; } = null;
+
+        public List<double> rotation { get; set; }
+
+        public List<double> translation { get; set; }
+
+
+        public List<double> matrix { get; set; }
+
+
+        public List<int> children { get; set; }
+
+        public Dictionary<string, object> extensions { get; set; }
+        public Dictionary<string, object> extras { get; set; }
+    }
+
+    public class glTFParameterGroup
+    {
+        public string GroupName { get; set; }
+        public List<glTFParameter> Parameters { get; set; }
+    }
+    public class glTFParameter
+    {
+        public string value { get; set; }
+        public string name { get; set; }
+    }
+
+
+
+    public class glTFMesh
+    {
+
+        public List<glTFMeshPrimitive> primitives { get; set; }
+    }
+
+
+    public class glTFMeshPrimitive
+    {
+
+        public glTFAttribute attributes { get; set; } = new glTFAttribute();
+
+        public int indices { get; set; }
+
+        public int? material { get; set; } = null;
+        public ModeEnum mode { get; set; } = ModeEnum.TRIANGLES;
+
+        public glTFPrimitiveExtensions extensions { get; set; }
+    }
+
+
+    public enum ModeEnum
+    {
+        POINTS = 0,
+        LINES = 1,
+        LINE_LOOP = 2,
+        LINE_STRIP = 3,
+        TRIANGLES = 4,
+        TRIANGLE_STRIP = 5,
+        TRIANGLE_FAN = 6
+    }
+
+    public class glTFAttribute
+    {
+        public int? POSITION { get; set; }
+        public int? NORMAL { get; set; }
+
+        public int? TEXCOORD_0 { get; set; }
+        public int? _BATCHID { get; set; }
+    }
+
+
+    public class glTFPrimitiveExtensions
+    {
+        public glTFDracoMesh KHR_draco_mesh_compression { get; set; } = new glTFDracoMesh();
+    }
+
+    public class glTFDracoMesh
+    {
+        public int? bufferView { get; set; } = null;
+        public glTFAttribute attributes { get; set; } = new glTFAttribute();
+    }
+
+
+
+    public class glTFBuffer
+    {
+        public string uri { get; set; }
+        public int byteLength { get; set; }
+    }
+
+    [JsonObject(MemberSerialization.OptOut)]
+    public class glTFBufferView
+    {
+        public string name { get; set; }
+
+        public int buffer { get; set; }
+        public int byteOffset { get; set; }
+        public int byteLength { get; set; }
+        public Targets? target { get; set; }
+        public int? byteStride { get; set; }
+
+        [JsonIgnore]
+        public string Base64 { get; set; }
+    }
+    public enum Targets
+    {
+        ARRAY_BUFFER = 34962, // 代表顶点数据
+        ELEMENT_ARRAY_BUFFER = 34963 // 代表顶点索引数据
+    }
+
+
+
+    public class glTFAccessor
+    {
+
+        public string name { get; set; }
+        public int? bufferView { get; set; }
+
+        public int? byteOffset { get; set; }
+        public ComponentType componentType { get; set; }
+        public int count { get; set; }
+        public string type { get; set; }
+        public List<double> max { get; set; }
+        public List<double> min { get; set; }
+
+    }
+
+    public class AccessorType
+    {
+        public static string VEC3 = "VEC3";
+        public static string VEC2 = "VEC2";
+        public static string SCALAR = "SCALAR";
+    }
+
+
+
     public enum ComponentType
     {
         BYTE = 5120,
@@ -29,293 +215,127 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         FLOAT = 5126
     }
 
-    public struct glTFContainer
-    {
-        public glTF glTF;
-        public List<glTFBinaryData> binaries;
-    }
 
-    /// <summary>
-    ///     The json serializable glTF file format.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0
-    /// </summary>
-    public struct glTF
-    {
-        public glTFVersion asset;
-        public List<glTFScene> scenes;
-        public List<glTFNode> nodes;
-        public List<glTFMesh> meshes;
-        public List<glTFBuffer> buffers;
-        public List<glTFBufferView> bufferViews;
-        public List<glTFAccessor> accessors;
-        public List<glTFMaterial> materials;
-    }
-
-    /// <summary>
-    ///     A binary data store serialized to a *.bin file
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#binary-data-storage
-    /// </summary>
-    public class glTFBinaryData : HashedType
-    {
-        public glTFBinaryBufferContents contents { get; set; }
-
-        //public List<float> vertexBuffer { get; set; } = new List<float>();
-        //public List<int> indexBuffer { get; set; } = new List<int>();
-        //public List<float> normalBuffer { get; set; } = new List<float>();
-        public int vertexAccessorIndex { get; set; }
-
-        public int indexAccessorIndex { get; set; }
-
-        //public int normalsAccessorIndex { get; set; }
-        public string name { get; set; }
-        //public string hashcode { get; set; }
-    }
-
-    [Serializable]
-    public class glTFBinaryBufferContents
-    {
-        public List<float> vertexBuffer { get; set; } = new List<float>();
-        public List<int> indexBuffer { get; set; } = new List<int>();
-    }
-
-    /// <summary>
-    ///     Required glTF asset information
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#asset
-    /// </summary>
-    public class glTFVersion
-    {
-        public string version = "2.0";
-    }
-
-    /// <summary>
-    ///     The scenes available to render.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#scenes
-    /// </summary>
-    public class glTFScene
-    {
-        public List<int> nodes = new List<int>();
-    }
-
-    /// <summary>
-    ///     The nodes defining individual (or nested) elements in the scene.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#nodes-and-hierarchy
-    /// </summary>
-    public class glTFNode
-    {
-        /// <summary>
-        ///     The user-defined name of this object
-        /// </summary>
-        public string name { get; set; }
-
-        /// <summary>
-        ///     The index of the mesh in this node.
-        /// </summary>
-        public int? mesh { get; set; } = null;
-
-        /// <summary>
-        ///     A floating-point 4x4 transformation matrix stored in column major order.
-        /// </summary>
-        public List<double> matrix { get; set; }
-
-        /// <summary>
-        ///     The indices of this node's children.
-        /// </summary>
-        public List<int> children { get; set; }
-
-        /// <summary>
-        ///     The extras describing this node.
-        /// </summary>
-        public glTFExtras extras { get; set; }
-    }
-
-    public class HashedType
-    {
-        public string hashcode { get; set; }
-    }
-
-    public class MeshContainer : HashedType
-    {
-        //public string hashcode { get; set; }
-        public glTFMesh contents { get; set; }
-    }
-
-    /// <summary>
-    ///     The array of primitives defining the mesh of an object.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
-    /// </summary>
-    [Serializable]
-    public class glTFMesh
-    {
-        public List<glTFMeshPrimitive> primitives { get; set; }
-    }
-
-    /// <summary>
-    ///     Properties defining where the GPU should look to find the mesh and material data.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
-    /// </summary>
-    [Serializable]
-    public class glTFMeshPrimitive
-    {
-        public glTFAttribute attributes { get; set; } = new glTFAttribute();
-        public int indices { get; set; }
-        public int? material { get; set; } = null;
-        public int mode { get; set; } = 4; // 4 is triangles
-    }
-
-    /// <summary>
-    ///     The glTF PBR Material format.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materials
-    /// </summary>
     public class glTFMaterial
     {
-        public string name { get; set; }
-        public glTFPBR pbrMetallicRoughness { get; set; }
-    }
 
+        public string name { get; set; }
+
+        public glTFPBR pbrMetallicRoughness { get; set; }
+
+        public string alphaMode { get; set; }
+
+        public bool? doubleSided { get; set; }
+
+
+        [JsonIgnore]
+        public int index { get; set; }
+    }
     public class glTFPBR
     {
-        public List<float> baseColorFactor { get; set; }
-        public float metallicFactor { get; set; }
-        public float roughnessFactor { get; set; }
+
+        public glTFbaseColorTexture baseColorTexture { get; set; }
+
+        public List<double> baseColorFactor { get; set; }
+        /// <summary>
+        /// 金属度，范围从0（非金属）到1（金属）
+        /// </summary>
+        public double? metallicFactor { get; set; }
+        /// <summary>
+        /// 粗糙度，范围从0.0（平滑）到1.0（粗糙）。
+        /// </summary>
+        public double? roughnessFactor { get; set; }
     }
 
-    /// <summary>
-    ///     The list of accessors available to the renderer for a particular mesh.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#meshes
-    /// </summary>
-    [Serializable]
-    public class glTFAttribute
+
+    public class glTFbaseColorTexture
     {
-        /// <summary>
-        ///     The index of the accessor for position data.
-        /// </summary>
-        public int POSITION { get; set; }
-        //public int NORMAL { get; set; }
+        public int? index { get; set; } = null;
     }
 
-    /// <summary>
-    ///     A reference to the location and size of binary data.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
-    /// </summary>
-    public class glTFBuffer
+
+
+    public class glTFTexture
     {
-        /// <summary>
-        ///     The uri of the buffer.
-        /// </summary>
+
+        public int? source { get; set; } = null;
+
+        public int? sampler { get; set; } = null;
+
+    }
+    public class glTFImage
+    {
+
         public string uri { get; set; }
 
-        /// <summary>
-        ///     The total byte length of the buffer.
-        /// </summary>
-        public int byteLength { get; set; }
-    }
+        public int? bufferView { get; set; }
 
-    /// <summary>
-    ///     A reference to a subsection of a buffer containing either vector or scalar data.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#buffers-and-buffer-views
-    /// </summary>
-    public class glTFBufferView
-    {
-        /// <summary>
-        ///     The index of the buffer.
-        /// </summary>
-        public int buffer { get; set; }
+        public string mimeType { get; set; }
 
-        /// <summary>
-        ///     The offset into the buffer in bytes.
-        /// </summary>
-        public int byteOffset { get; set; }
-
-        /// <summary>
-        ///     The length of the bufferView in bytes.
-        /// </summary>
-        public int byteLength { get; set; }
-
-        /// <summary>
-        ///     The target that the GPU buffer should be bound to.
-        /// </summary>
-        public Targets target { get; set; }
-
-        /// <summary>
-        ///     A user defined name for this view.
-        /// </summary>
         public string name { get; set; }
     }
 
-    /// <summary>
-    ///     A reference to a subsection of a BufferView containing a particular data type.
-    ///     https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#accessors
-    /// </summary>
-    public class glTFAccessor
+    public class glTFSampler
     {
-        /// <summary>
-        ///     The index of the bufferView.
-        /// </summary>
-        public int bufferView { get; set; }
+        public double magFilter { get; set; }
 
-        /// <summary>
-        ///     The offset relative to the start of the bufferView in bytes.
-        /// </summary>
-        public int byteOffset { get; set; }
+        public double minFilter { get; set; }
+        public double wrapS { get; set; }
+        public double wrapT { get; set; }
+    }
 
-        /// <summary>
-        ///     the datatype of the components in the attribute
-        /// </summary>
-        public ComponentType componentType { get; set; }
 
-        /// <summary>
-        ///     The number of attributes referenced by this accessor.
-        /// </summary>
-        public int count { get; set; }
-
-        /// <summary>
-        ///     Specifies if the attribute is a scalar, vector, or matrix
-        /// </summary>
+    public class glTFCameras
+    {
         public string type { get; set; }
 
-        /// <summary>
-        ///     Maximum value of each component in this attribute.
-        /// </summary>
-        public List<float> max { get; set; }
+        public glTFPerspectiveCamera perspective { get; set; } = null;
 
-        /// <summary>
-        ///     Minimum value of each component in this attribute.
-        /// </summary>
-        public List<float> min { get; set; }
-
-        /// <summary>
-        ///     A user defined name for this accessor.
-        /// </summary>
-        public string name { get; set; }
+        public glTFOrthographicCamera orthographic { get; set; } = null;
     }
 
-    public class glTFExtras
+    public class CameraType
     {
-        /// <summary>
-        ///     The Revit created UniqueId for this object
-        /// </summary>
-        public string UniqueId { get; set; }
-
-        public GridParameters GridParameters { get; set; }
-        public Dictionary<string, string> Properties { get; set; }
+        public static string perspective = "perspective";
+        public static string orthographic = "orthographic";
     }
 
-    public class GridParameters
+    public class glTFPerspectiveCamera
     {
-        public List<double> origin { get; set; }
-        public List<double> direction { get; set; }
-        public double length { get; set; }
+        public double aspectRatio { get; set; }
+
+        public double yfov { get; set; }
+        public double zfar { get; set; }
+        public double znear { get; set; }
     }
 
-    //public class glTFFunctions
-    //{
-    //    public static glTFBinaryData getMeshData(glTFNode node, glTF gltf)
-    //    {
-    //        if(node.mesh.HasValue)
-    //        {
-    //            glTFMesh mesh = gltf.meshes[node.mesh.Value];
-    //            mesh.
-    //        }
-    //    }
-    //}
+    public class glTFOrthographicCamera
+    {
+        public double xmag { get; set; }
+
+        public double ymag { get; set; }
+        public double zfar { get; set; }
+        public double znear { get; set; }
+    }
+
+    public class glTFBinaryData
+    {
+
+        public List<float> vertexBuffer { get; set; } = new List<float>();
+
+
+        public List<float> normalBuffer { get; set; } = new List<float>();
+
+        public List<int> indexBuffer { get; set; } = new List<int>();
+
+        public List<float> uvBuffer { get; set; } = new List<float>();
+
+        public List<int> batchidBuffer { get; set; } = new List<int>();
+        public int? indexMax { get; set; }
+        public int? indexAlign { get; set; }
+
+
+        public IntPtr dracoData { get; set; }
+        public int dracoSize { get; set; }
+    }
 }
