@@ -4,6 +4,7 @@ using System.Linq;
 using ASRR.Revit.Core.Elements;
 using ASRR.Revit.Core.Exporter.Groups.Model;
 using ASRR.Revit.Core.Model;
+using ASRR.Revit.Core.Utilities;
 using ASRR.Revit.Core.Warnings;
 using Autodesk.Revit.DB;
 using NLog;
@@ -114,7 +115,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
             Document destinationDoc, ref List<GroupTypeSet> copiedGroupTypeSets)
         {
             var existingGroupTypes =
-                Utilities.GetAllOfType<GroupType>(destinationDoc);
+                Collector.GetAllOfType<GroupType>(destinationDoc);
 
             var existingGroupTypeSet = CreateExistingGroupTypeSet(groupTypeSet, existingGroupTypes);
             //If the modelgrouptype already exists in the destination document, use it instead of copying it in again
@@ -145,7 +146,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         {
             ICollection<ElementId> copiedIds = new List<ElementId>();
 
-            var copyOptions = Utilities.UseDestinationOnDuplicateNameCopyPasteOptions();
+            var copyOptions = DocumentUtilities.CopyPasteOptions();
 
             var ids = new List<ElementId> {groupTypeSet.ModelGroupType.Id};
             ids.AddRange(
@@ -234,7 +235,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         private void EnableAttachedDetailGroupsInFloorPlans(Document doc, Group modelGroup,
             List<AttachedDetailGroupType> attachedDetailGroupTypes)
         {
-            var allFloorPlans = Utilities.GetAllOfType<ViewPlan>(doc)
+            var allFloorPlans = Collector.GetAllOfType<ViewPlan>(doc)
                 .Where(v => v.ViewType == ViewType.FloorPlan).ToList();
 
             foreach (var detailGroupType in attachedDetailGroupTypes)

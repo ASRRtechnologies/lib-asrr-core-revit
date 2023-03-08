@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ASRR.Revit.Core.Elements;
+using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
 using NLog;
 
@@ -10,10 +10,9 @@ namespace ASRR.Revit.Core.Exporter
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-
         public static void ExportPNG(Document document, string exportPath)
         {
-            var view = Utilities.Get3dView(document);
+            var view = Collector.Get3dView(document);
             var opt = new ImageExportOptions
             {
                 ZoomType = ZoomFitType.FitToPage,
