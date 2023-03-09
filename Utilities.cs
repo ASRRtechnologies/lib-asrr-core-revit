@@ -258,5 +258,35 @@ namespace ASRR.Revit.Core.Elements
             copyOptions.SetDuplicateTypeNamesHandler(new UseDestinationHandler());
             return copyOptions;
         }
+
+        /// <summary>
+        ///     Compose a clean link of separate parts like Path.Combine does
+        /// </summary>
+        public static string CombineUris(params string[] uris)
+        {
+            if (uris == null)
+                throw new ArgumentNullException(nameof(uris));
+
+            var urisList = uris.ToList();
+
+            var result = "";
+
+            for (var i = 0; i < urisList.Count; i++)
+                if (urisList[i] != null)
+                {
+                    var trimmedUri = urisList[i];
+                    trimmedUri = trimmedUri.TrimStart('/', '\\');
+                    trimmedUri = trimmedUri.TrimEnd('/', '\\');
+                    var slash = i == 0 ? "" : "/";
+                    result += $"{slash}{trimmedUri}";
+                }
+
+            return result;
+        }
+
+        public static string CleanUpPath(string path)
+        {
+            return path == null ? throw new ArgumentNullException(nameof(path)) : CombineUris(path);
+        }
     }
 }
