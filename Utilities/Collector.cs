@@ -1,9 +1,8 @@
-﻿using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
+using NLog;
 using System.Collections.Generic;
 using System.Linq;
-using NLog;
-using NLog.Fluent;
 
 namespace ASRR.Revit.Core.Utilities
 {

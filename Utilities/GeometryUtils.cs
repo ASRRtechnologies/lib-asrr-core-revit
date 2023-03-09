@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using ASRR.Revit.Core.Elements.Placement;
-using ASRR.Revit.Core.Utilities;
+﻿using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
+using System;
+using System.Collections.Generic;
 
 namespace ASRR.Revit.Core.Elements
 {
@@ -86,7 +85,7 @@ namespace ASRR.Revit.Core.Elements
             xyzQ11Feet.Add(new XYZ(0, 0, CoordinateUtilities.ConvertMmToFeet(1500)));
             xyzQ33Feet.Add(new XYZ(0, 0, CoordinateUtilities.ConvertMmToFeet(1500)));
 
-            return new List<XYZ> {xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet};
+            return new List<XYZ> { xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet };
         }
     }
 }

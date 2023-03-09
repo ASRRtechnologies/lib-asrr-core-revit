@@ -1,12 +1,9 @@
 ﻿using ASRR.Revit.Core.Elements;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using NLog.Fluent;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using NLog;
+using System;
+using System.IO;
 
 namespace ASRR.Revit.Core.Utilities
 {
@@ -87,9 +84,9 @@ namespace ASRR.Revit.Core.Utilities
 
         public static CopyPasteOptions CopyPasteOptions()
         {
-                var copyPasteOptions = new CopyPasteOptions();
-                copyPasteOptions.SetDuplicateTypeNamesHandler(new UseDestinationHandler());
-                return copyPasteOptions;
+            var copyPasteOptions = new CopyPasteOptions();
+            copyPasteOptions.SetDuplicateTypeNamesHandler(new UseDestinationHandler());
+            return copyPasteOptions;
         }
 
         public DuplicateTypeAction OnDuplicateTypeNamesFound()

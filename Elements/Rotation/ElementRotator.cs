@@ -1,6 +1,6 @@
-﻿using System;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using NLog;
+using System;
 
 namespace ASRR.Revit.Core.Elements.Rotation
 {

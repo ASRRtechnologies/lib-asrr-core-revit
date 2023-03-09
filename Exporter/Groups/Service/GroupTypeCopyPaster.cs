@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ASRR.Revit.Core.Elements;
-using ASRR.Revit.Core.Exporter.Groups.Model;
+﻿using ASRR.Revit.Core.Exporter.Groups.Model;
 using ASRR.Revit.Core.Model;
 using ASRR.Revit.Core.Utilities;
 using ASRR.Revit.Core.Warnings;
 using Autodesk.Revit.DB;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ASRR.Revit.Core.Exporter.Groups.Service
 {
@@ -148,7 +147,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
             var copyOptions = DocumentUtilities.CopyPasteOptions();
 
-            var ids = new List<ElementId> {groupTypeSet.ModelGroupType.Id};
+            var ids = new List<ElementId> { groupTypeSet.ModelGroupType.Id };
             ids.AddRange(
                 groupTypeSet.AttachedDetailGroupTypes.Select(detailGroupType => detailGroupType.GroupType.Id));
 

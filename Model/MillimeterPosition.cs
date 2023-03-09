@@ -1,5 +1,4 @@
-﻿using ASRR.Revit.Core.Elements.Placement;
-using ASRR.Revit.Core.Utilities;
+﻿using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
 
 namespace ASRR.Revit.Core.Model

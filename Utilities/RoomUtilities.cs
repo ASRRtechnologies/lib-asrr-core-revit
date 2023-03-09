@@ -1,7 +1,6 @@
-﻿using ASRR.Revit.Core.Elements.Placement;
-using ASRR.Revit.Core.Elements;
-using Autodesk.Revit.DB.Architecture;
+﻿using ASRR.Revit.Core.Elements;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +10,7 @@ namespace ASRR.Revit.Core.Utilities
     {
 
 
-        
+
         public static bool RoomIntersects(Wall wall, bool mirrored, List<Room> rooms)
         {
             //deze checked alleen het midpoint van de wall op een room. Hier kan dus perongeluk een element staat bijv een wall waardoor de room niet gevonden wordt

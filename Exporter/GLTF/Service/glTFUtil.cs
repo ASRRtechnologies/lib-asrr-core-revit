@@ -1,9 +1,9 @@
 ﻿using ASRR.Revit.Core.Exporter.GLTF.Model;
-using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Visual;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System;
 using System.Linq;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Service

@@ -1,5 +1,5 @@
-﻿using System;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
+using System;
 
 namespace ASRR.Revit.Core.Utilities
 {

@@ -1,11 +1,8 @@
-﻿using ASRR.Revit.Core.Elements.Parameters.Dto;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using NLog;
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Windows.Media.Media3D;
 
 namespace ASRR.Revit.Core.Elements.Parameters
 {
@@ -89,7 +86,7 @@ namespace ASRR.Revit.Core.Elements.Parameters
             }
             //string tpName = tp.Name;
             //logger.Info($"material tp : {tp.Name}");
-            
+
             switch (FPR.GetType().Name)
             {
                 case "Wall":

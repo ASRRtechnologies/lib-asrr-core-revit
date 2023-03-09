@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ASRR.Revit.Core.Elements.Rotation;
+﻿using ASRR.Revit.Core.Elements.Rotation;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using ParameterUtils = ASRR.Revit.Core.Elements.Parameters.ParameterUtils;
 
 namespace ASRR.Revit.Core.Elements.Placement
@@ -36,7 +36,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                     doc.Create.NewFamilyInstance(location, symbol, level, StructuralType.NonStructural);
                 Log.Info(
                     $"Placed new family instance at {location} on level {level?.Elevation}, id is '{newFamilyInstance.Id}'");
-                var instanceLocation = ((LocationPoint) newFamilyInstance.Location).Point;
+                var instanceLocation = ((LocationPoint)newFamilyInstance.Location).Point;
 
                 if (rotation != 0.0)
                 {
@@ -49,7 +49,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                     Log.Info("Mirroring element");
                     using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, location)) // ZX
                     {
-                        ElementTransformUtils.MirrorElements(doc, new[] {newFamilyInstance.Id}, plane, false);
+                        ElementTransformUtils.MirrorElements(doc, new[] { newFamilyInstance.Id }, plane, false);
                     }
                 }
 
@@ -86,7 +86,7 @@ namespace ASRR.Revit.Core.Elements.Placement
                     Log.Info("Mirroring element");
                     using (var plane = Plane.CreateByNormalAndOrigin(XYZ.BasisX, curve.GetEndPoint(0))) // ZX
                     {
-                        ElementTransformUtils.MirrorElements(doc, new[] {newFamilyInstance.Id}, plane, false);
+                        ElementTransformUtils.MirrorElements(doc, new[] { newFamilyInstance.Id }, plane, false);
                     }
                 }
 

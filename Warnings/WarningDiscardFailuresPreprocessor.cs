@@ -24,7 +24,7 @@ namespace ASRR.Revit.Core.Warnings
 
                 //Simply eat all warnings
                 if (failureSeverity != FailureSeverity.Warning) continue;
-                
+
                 _logger?.Warn($"'{failure.GetDescriptionText()}'");
                 failuresAccessor.DeleteWarning(failure);
             }

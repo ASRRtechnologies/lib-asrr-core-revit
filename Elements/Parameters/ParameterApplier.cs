@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using ASRR.Revit.Core.Elements.Placement;
-using ASRR.Revit.Core.Utilities;
+﻿using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
 using NLog;
+using System.Collections.Generic;
 
 namespace ASRR.Revit.Core.Elements.Parameters
 {
