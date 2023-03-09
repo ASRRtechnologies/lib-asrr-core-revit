@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using ASRR.Revit.Core.Model;
+﻿using ASRR.Revit.Core.Model;
 using Autodesk.Revit.DB;
+using System.Collections.Generic;
 
 namespace ASRR.Revit.Core.Exporter.Groups.Model
 {

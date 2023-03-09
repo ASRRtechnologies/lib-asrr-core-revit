@@ -1,7 +1,7 @@
-﻿using System;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
+using System;
 
-namespace ASRR.Revit.Core.Elements.Placement
+namespace ASRR.Revit.Core.Utilities
 {
     public class CoordinateUtilities
     {
@@ -52,7 +52,6 @@ namespace ASRR.Revit.Core.Elements.Placement
                 UnitTypeId.Millimeters);
         }
 
-
         public static bool ApproximateEquals(XYZ position, XYZ otherPositionInMillimeters)
         {
             return Math.Abs(position.X - otherPositionInMillimeters.X) < 0.05 &&
@@ -63,6 +62,33 @@ namespace ASRR.Revit.Core.Elements.Placement
         public static bool ApproximateEquals(double rotation, double otherPositionInMillimeters)
         {
             return Math.Abs(rotation - otherPositionInMillimeters) < 0.05;
+        }
+
+        public static string WriteXyz(XYZ vector)
+        {
+            return $"({vector.X:0.##}, {vector.Y:0.##}, {vector.Z:0.##})";
+        }
+
+
+        public static string ToString(XYZ point)
+        {
+            return "(" + point.X + ", " + point.Y + ", " + point.Z + ")";
+        }
+
+        public static double SquareFootToSquareM(double sqFoot, int decimals = 2)
+        {
+            return Math.Round(sqFoot * 0.092903, decimals);
+        }
+
+
+        public static string CurveToString(Curve curve)
+        {
+            var result = "Start: ";
+            result += ToString(curve.GetEndPoint(0));
+            result += "End: ";
+            result += ToString(curve.GetEndPoint(1));
+            result += Environment.NewLine;
+            return result;
         }
     }
 }

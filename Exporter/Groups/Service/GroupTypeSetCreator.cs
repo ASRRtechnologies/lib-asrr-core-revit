@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ASRR.Revit.Core.Elements;
-using ASRR.Revit.Core.Exporter.Groups.Model;
+﻿using ASRR.Revit.Core.Exporter.Groups.Model;
 using ASRR.Revit.Core.Model;
+using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ASRR.Revit.Core.Exporter.Groups.Service
 {
@@ -47,7 +47,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         {
             var detailGroupTypes = new List<AttachedDetailGroupType>();
             var detailGroups = FindAttachedDetailGroups(doc, modelGroup);
-            var allFloorPlans = Utilities.GetAllOfType<ViewPlan>(doc)
+            var allFloorPlans = Collector.GetAllOfType<ViewPlan>(doc)
                 .Where(v => v.ViewType == ViewType.FloorPlan).ToList();
 
             foreach (var detailGroup in detailGroups)

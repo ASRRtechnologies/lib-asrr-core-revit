@@ -48,12 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Elements\Families\FamilyUtils.cs" />
-    <Compile Include="Elements\GeometryUtils.cs" />
+    <Compile Include="Utilities\Collector.cs" />
+    <Compile Include="Utilities\FileUtilities.cs" />
+    <Compile Include="Utilities\GeometryUtils.cs" />
     <Compile Include="Elements\Parameters\Dto\BaseRevitParameter.cs" />
     <Compile Include="Elements\Parameters\Dto\RevitParameter.cs" />
     <Compile Include="Elements\Parameters\ParameterApplier.cs" />
     <Compile Include="Elements\Parameters\RevitBuildInParameters.cs" />
-    <Compile Include="Elements\Placement\CoordinateUtilities.cs" />
+    <Compile Include="Utilities\CoordinateUtilities.cs" />
     <Compile Include="Elements\Placement\FamilyPlacer.cs" />
     <Compile Include="Elements\Rotation\ElementRotator.cs" />
     <Compile Include="Exporter\ExportUtilities.cs" />
@@ -72,18 +74,20 @@
     <Compile Include="Model\VectorRotation.cs" />
     <Compile Include="RevitModel\ModelFetcher.cs" />
     <Compile Include="RevitModel\ModelPlacer.cs" />
-    <Compile Include="UseDestinationHandler.cs" />
-    <Compile Include="Utilities.cs" />
+    <Compile Include="Utilities\UseDestinationHandler.cs" />
     <Compile Include="Model\IPosition.cs" />
     <Compile Include="Model\IRotation.cs" />
     <Compile Include="Model\FeetPosition.cs" />
     <Compile Include="Model\MillimeterPosition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TransformUtilities.cs" />
+    <Compile Include="Utilities\TransformUtilities.cs" />
     <Compile Include="UI\RibbonPanelCreator\DictionaryBasedRibbonPanelCreator.cs" />
     <Compile Include="UI\RibbonPanelCreator\IRibbonPanelCreator.cs" />
     <Compile Include="UI\RibbonPanelItemCreator\IRibbonPanelItemCreator.cs" />
     <Compile Include="UI\RibbonPanelItemCreator\PushButtonRibbonPanelItemCreator.cs" />
+    <Compile Include="Utilities\DocumentUtilities.cs" />
+    <Compile Include="Utilities\RoomUtilities.cs" />
+    <Compile Include="Utilities\WallUtilities.cs" />
     <Compile Include="Warnings\WarningDiscardFailuresPreprocessor.cs" />
   </ItemGroup>
   <ItemGroup>

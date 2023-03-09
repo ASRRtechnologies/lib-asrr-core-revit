@@ -1,16 +1,16 @@
 ﻿using ASRR.Revit.Core.Exporter.GLTF.Model;
-using Autodesk.Revit.DB.Visual;
+using ASRR.Revit.Core.Exporter.GLTF.Service;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Visual;
 using Microsoft.Win32;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System;
-using System.Linq;
-using ASRR.Revit.Core.Exporter.GLTF.Service;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Context
 {
@@ -21,7 +21,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Context
 
         public bool exportProperty { get; set; } = false;
     }
-    
+
     public class GlTfExportContext : IExportContext
     {
         private GlTfSetting setting;
@@ -114,7 +114,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Context
                         //
                         // }
                         try
-                        
+
                         {
                             // glTFDraco.deleteDracoData(data);
                         }
