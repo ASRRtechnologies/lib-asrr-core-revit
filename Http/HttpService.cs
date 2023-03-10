@@ -56,10 +56,10 @@ namespace ASRR.Revit.Core.Http
             return response;
         }
 
-        public T PostForObject<T>(string path, T content)
+        public T1 PostForObject<T1, T2>(string path, T2 content)
         {
-            var response = RunTask(Task.Run(async () => await _httpClient.PostAsJsonAsync<T>(CleanUpPath(path), content)));
-            if (response != null) return RunTask(Task.Run(async () => await response.Content.ReadFromJsonAsync<T>()));
+            var response = RunTask(Task.Run(async () => await _httpClient.PostAsJsonAsync(CleanUpPath(path), content)));
+            if (response != null) return RunTask(Task.Run(async () => await response.Content.ReadFromJsonAsync<T1>()));
             _logger.Error($"Failed to POST object to {path}");
             return default;
         }
@@ -86,7 +86,7 @@ namespace ASRR.Revit.Core.Http
             return result;
         }
 
-        public static string CleanUpPath(string path)
+        private static string CleanUpPath(string path)
         {
             return path == null ? throw new ArgumentNullException(nameof(path)) : CombineUris(path);
         }
