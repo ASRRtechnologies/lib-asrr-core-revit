@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using ASRR.Revit.Core.Http;
 
 namespace ASRR.Revit.Core.RevitModel
 {
