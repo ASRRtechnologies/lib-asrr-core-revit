@@ -36,27 +36,32 @@ namespace ASRR.Revit.Core.RevitModel
                 return false;
             }
 
-            File.WriteAllBytes(destinationPath, fileBytes); // todo: (check of ie al bestaat, download alleen nieuwe)
+            File.WriteAllBytes(destinationPath, fileBytes);
             _logger.Info($"Downloaded model from {url} to {destinationPath}");
             return true;
         }
 
-        private static bool InitDestinationPath(string destinationPath)
+        private bool InitDestinationPath(string destinationPath)
         {
-            string directory;
             try
             {
-                directory = Path.GetDirectoryName(destinationPath);
+                var fileName = Path.GetFileName(destinationPath);
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    _logger.Error($"Fetching model failed. Destination path does not have a filename: {destinationPath}");
+                    return false;
+                }
+                
+                var directory = Path.GetDirectoryName(destinationPath);
+                if (string.IsNullOrEmpty(directory)) return false;
+
+                Directory.CreateDirectory(directory);
+                return true;
             }
             catch (Exception)
             {
                 return false;
             }
-
-            if (directory == null) return false;
-
-            Directory.CreateDirectory(directory);
-            return true;
         }
     }
 }
