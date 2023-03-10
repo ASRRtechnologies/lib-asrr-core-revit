@@ -38,6 +38,18 @@ namespace ASRR.Revit.Core
             return null;
         }
 
+
+        public byte[] Download(string path)
+        {
+            var task = Task.Run(async () => await _httpClient.GetByteArrayAsync(CleanUpPath(path)));
+            task.Wait();
+
+            if (task.IsCompleted) return task.Result;
+
+            _logger.Error($"Failed to download from {path}");
+            return null;
+        }
+
         public HttpResponseMessage Post(string path, HttpContent content)
         {
             var task = Task.Run(async () => await _httpClient.PostAsync(CleanUpPath(path), content));
