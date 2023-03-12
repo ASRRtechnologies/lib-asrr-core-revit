@@ -102,5 +102,11 @@ namespace ASRR.Revit.Core.Utilities
 
             return result;
         }
+        public static Element GetElementById(Document doc, ElementId elementId)
+        {
+            Element element = doc.GetElement(elementId);
+            return element;
+        }
+
     }
 }

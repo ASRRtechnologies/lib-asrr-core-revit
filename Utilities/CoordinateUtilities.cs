@@ -24,7 +24,7 @@ namespace ASRR.Revit.Core.Utilities
                 ConvertFeetToMm(vector.Z)
             );
         }
-
+        
         public static XYZ DynamicConvert(XYZ vector, ForgeTypeId current, ForgeTypeId desired)
         {
             return new XYZ

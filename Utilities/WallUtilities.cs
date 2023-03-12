@@ -2,6 +2,9 @@
 using Autodesk.Revit.DB;
 using System;
 using NLog;
+using System.Collections.Generic;
+using System.ServiceModel.Channels;
+using Autodesk.Revit.ApplicationServices;
 
 namespace ASRR.Revit.Core.Utilities
 {
@@ -90,6 +93,44 @@ namespace ASRR.Revit.Core.Utilities
 
             return WallFunction.Exterior == f;
         }
+
+        public List<Face> GetAllWallFaces(Wall wall)
+        {
+            List<Face> facesLst = new List<Face>();
+            ReferenceArray refArray = new ReferenceArray();
+            string faceInfo = "";
+            Options opt = new Options();
+            opt.ComputeReferences = true;
+            Autodesk.Revit.DB.GeometryElement geomElem = wall.get_Geometry(opt);
+            foreach (GeometryObject geomObj in geomElem)
+            {
+                Solid geomSolid = geomObj as Solid;
+                if (null != geomSolid)
+                {
+                    int faces = 0;
+                    double totalArea = 0;
+                    foreach (Face geomFace in geomSolid.Faces)
+                    {
+                        
+
+
+                        Face face = geomFace as Face;
+                        refArray.Append(face.Reference);
+                        //Log.Info($"--------------- {face.Reference.ElementReferenceType} ---------------");
+                        facesLst.Add(face);
+                        faces++;
+                        faceInfo += "Face " + faces + " area: " + geomFace.Area.ToString() + "\n";
+                        totalArea += geomFace.Area;
+                    }
+                        faceInfo += "Number of faces: " + faces + "\n";
+                    faceInfo += "Total area: " + totalArea.ToString() + "\n";
+                }
+            }
+            //TaskDialog.Show("Revit", faceInfo);
+            return facesLst;
+        }
+
+
 
     }
 }
