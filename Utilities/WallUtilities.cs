@@ -54,7 +54,7 @@ namespace ASRR.Revit.Core.Utilities
             return location.Curve;
         }
 
-        public Tuple<double, double> GetWallDimensions(Wall wall)
+        public static Tuple<double, double> GetWallDimensions(Wall wall)
         {
             var curve = GetCurve(wall);
             var length = curve.Length;
@@ -62,7 +62,7 @@ namespace ASRR.Revit.Core.Utilities
             return new Tuple<double, double>(length, height);
         }
 
-        public Tuple<XYZ, XYZ> GetEndPoints(Wall wall)
+        public static Tuple<XYZ, XYZ> GetEndPoints(Wall wall)
         {
             var curve = GetCurve(wall);
             var start = curve.GetEndPoint(0);
