@@ -25,6 +25,11 @@ namespace ASRR.Revit.Core.Utilities
             return collector.WherePasses(filter).ToElements();
         }
 
+        /// <summary>
+        ///    Returns all the rooms in the document
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         public static IEnumerable<Room> GetRooms(Document doc)
         {
             var elements = GetElementsOfCategory(doc, BuiltInCategory.OST_Rooms);
@@ -71,6 +76,24 @@ namespace ASRR.Revit.Core.Utilities
                 if (element == null)
                 {
                     _log.Error($"Could not find element with name '{elementName}'");
+                    continue; //Don't add null when element can't be found
+                }
+
+                result.Add(element);
+            }
+
+            return result;
+        }
+
+        public static List<Element> GetElementsByIds(Document document, ICollection<ElementId> selectedIds)
+        {
+            var result = new List<Element>();
+            foreach (var id in selectedIds)
+            {
+                var element = document.GetElement(id);
+                if (element == null)
+                {
+                    _log.Error($"Could not find element with id '{id}'");
                     continue; //Don't add null when element can't be found
                 }
 

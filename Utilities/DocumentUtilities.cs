@@ -3,14 +3,14 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using NLog;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ASRR.Revit.Core.Utilities
 {
     public class DocumentUtilities
     {
-
-        Logger _log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _log = LogManager.GetCurrentClassLogger();
 
         //Saves and closes, as well as removes annoying back-up files
         public static void SaveAndCloseDocument(Document doc, string destinationFilePath, bool overwrite = true)
@@ -80,6 +80,19 @@ namespace ASRR.Revit.Core.Utilities
 
                 return SketchPlane.Create(doc, plane);
             }
+        }
+
+        public static List<Element> GetSelection(UIDocument uiDoc)
+        {
+            var selection = uiDoc.Selection;
+            var selectedIds = selection.GetElementIds();
+
+            _log.Debug($"Selected {selectedIds.Count} elements");
+
+            if (selectedIds.Count != 0) return Collector.GetElementsByIds(uiDoc.Document, selectedIds);
+            
+            TaskDialog.Show("Error", "Please select elements to export");
+            return null;
         }
 
         public static CopyPasteOptions CopyPasteOptions()

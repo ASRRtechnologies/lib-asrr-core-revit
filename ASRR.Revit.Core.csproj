@@ -54,7 +54,7 @@
     <Compile Include="Elements\Parameters\Dto\BaseRevitParameter.cs" />
     <Compile Include="Elements\Parameters\Dto\RevitParameter.cs" />
     <Compile Include="Elements\Parameters\ParameterApplier.cs" />
-    <Compile Include="Elements\Parameters\RevitBuildInParameters.cs" />
+    <Compile Include="Utilities\BuiltInParameterUtilities.cs" />
     <Compile Include="Utilities\CoordinateUtilities.cs" />
     <Compile Include="Elements\Placement\FamilyPlacer.cs" />
     <Compile Include="Elements\Rotation\ElementRotator.cs" />
