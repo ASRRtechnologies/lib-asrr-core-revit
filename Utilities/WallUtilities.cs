@@ -30,14 +30,14 @@ namespace ASRR.Revit.Core.Utilities
         public static int WallLength(Wall wall)
         {
             var parameter = wall.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsValueString();
-            Log.Info($"wall length is: {parameter.ToString()}");
+            Log.Info($"wall length is: {parameter}");
             return Convert.ToInt32(parameter);
         }
 
         public static int WallHeight(Wall wall)
         {
             var parameter = wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).AsValueString();
-            Log.Info($"wall height is: {parameter.ToString()}");
+            Log.Info($"wall height is: {parameter}");
             return Convert.ToInt32(parameter);
         }
 
@@ -62,7 +62,7 @@ namespace ASRR.Revit.Core.Utilities
             return new Tuple<double, double>(length, height);
         }
 
-        public Tuple<XYZ, XYZ> GetWallEndPoints(Wall wall)
+        public Tuple<XYZ, XYZ> GetEndPoints(Wall wall)
         {
             var curve = GetCurve(wall);
             var start = curve.GetEndPoint(0);
