@@ -18,9 +18,9 @@ namespace ASRR.Revit.Core.Utilities
             var destinationDirectory = Path.GetDirectoryName(destinationFilePath);
             Directory.CreateDirectory(destinationDirectory);
 
-            var saveAsOptions = new SaveAsOptions { OverwriteExistingFile = overwrite };
+            var saveAsOptions = new SaveAsOptions {OverwriteExistingFile = overwrite};
             doc.SaveAs(destinationFilePath, saveAsOptions);
-            doc.Close();
+            doc.Close(true);
 
             FileUtilities.RemoveBackUpFilesFromDirectory(new FileInfo(destinationFilePath).Directory.FullName);
         }
@@ -90,7 +90,7 @@ namespace ASRR.Revit.Core.Utilities
             _log.Debug($"Selected {selectedIds.Count} elements");
 
             if (selectedIds.Count != 0) return Collector.GetElementsByIds(uiDoc.Document, selectedIds);
-            
+
             TaskDialog.Show("Error", "Please select elements to export");
             return null;
         }

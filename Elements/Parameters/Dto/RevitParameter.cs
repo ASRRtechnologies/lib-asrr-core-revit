@@ -13,7 +13,7 @@ namespace ASRR.Revit.Core.Elements.Parameters.Dto
         {
             try
             {
-                IList<Parameter> parameterValue = element.GetParameters(parameterName);
+                var parameterValue = element.GetParameters(parameterName);
                 dynamic parameterV = null;
 
                 logger.Info($"GetParameterValue : '{parameterValue[0].AsValueString()}' for parameterName : '{parameterName}', elementId '{element.Id}'");
@@ -34,14 +34,11 @@ namespace ASRR.Revit.Core.Elements.Parameters.Dto
             {
                 ElementType type = doc.GetElement(element.GetTypeId()) as ElementType;
                 dynamic value = null;
-                if (type != null)
+                if (type?.LookupParameter(parameterName) != null)
                 {
-                    if (type.LookupParameter(parameterName) != null)
-                    {
-                        value = _getParameterValueByCorrectStorageType(type.LookupParameter(parameterName));
-                        logger.Info($"GetParameterValue : '{value}' for parameterName : '{parameterName}', elementId '{element.Id}'");
-                        return value;
-                    }
+                    value = _getParameterValueByCorrectStorageType(type.LookupParameter(parameterName));
+                    // logger.Info($"GetParameterValue : '{value}' for parameterName : '{parameterName}', elementId '{element.Id}'");
+                    return value;
                 }
                 logger.Warn($"Can't get Type parameter with parameterName '{parameterName}', elementId '{element.Id}'");
                 return null;
