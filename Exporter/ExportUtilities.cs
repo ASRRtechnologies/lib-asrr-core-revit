@@ -27,6 +27,7 @@ namespace ASRR.Revit.Core.Exporter
             var ids = new List<ElementId> { view.Id };
             opt.SetViewsAndSheets(ids);
 
+
             using (var transaction = new Transaction(document))
             {
                 transaction.Start("Set view graphics to Shaded");
