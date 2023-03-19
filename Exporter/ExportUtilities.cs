@@ -26,6 +26,14 @@ namespace ASRR.Revit.Core.Exporter
             };
             var ids = new List<ElementId> { view.Id };
             opt.SetViewsAndSheets(ids);
+
+            using (var transaction = new Transaction(document))
+            {
+                transaction.Start("Set view graphics to Shaded");
+                view.get_Parameter(BuiltInParameter.MODEL_GRAPHICS_STYLE).Set(3); //3 = Shaded
+                transaction.Commit();
+            }
+
             document.ExportImage(opt);
 
             if (File.Exists(exportPath))
