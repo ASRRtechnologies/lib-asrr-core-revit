@@ -3,8 +3,10 @@ using Autodesk.Revit.DB;
 using System;
 using NLog;
 using System.Collections.Generic;
+using System.Linq;
 using System.ServiceModel.Channels;
 using Autodesk.Revit.ApplicationServices;
+using ASRR.Revit.Core.Elements;
 
 namespace ASRR.Revit.Core.Utilities
 {
@@ -122,7 +124,7 @@ namespace ASRR.Revit.Core.Utilities
                         faceInfo += "Face " + faces + " area: " + geomFace.Area.ToString() + "\n";
                         totalArea += geomFace.Area;
                     }
-                        faceInfo += "Number of faces: " + faces + "\n";
+                    faceInfo += "Number of faces: " + faces + "\n";
                     faceInfo += "Total area: " + totalArea.ToString() + "\n";
                 }
             }
@@ -131,6 +133,31 @@ namespace ASRR.Revit.Core.Utilities
         }
 
 
+        public static bool Intersects(Wall wall, bool mirrored, ReferenceIntersector referenceIntersector, Document doc)
+        {
+            var orientation = wall.Orientation;
+            var inverseNormal = mirrored ? orientation : GeometryUtils.GetInverse(orientation);
+            var quarters = GeometryUtils.GetWallClashPoints(wall);
+
+            var addition = 0.1f;
+
+            foreach (var context in quarters.Select(q => q + (inverseNormal * addition)).Select(pointInFrontOfFace =>
+                         referenceIntersector.FindNearest(pointInFrontOfFace, inverseNormal)))
+            {
+                if (context != null && doc.GetElement(context.GetReference()) is Wall w &&
+                    !IsExterior(w.WallType))
+                    return false;
+
+                if (context != null) Log.Info($"Prox: {CoordinateUtilities.ConvertFeetToMm(context.Proximity)}");
+
+                //TODO: deze 500 variabele vangen in settings
+                var result = context != null && CoordinateUtilities.ConvertFeetToMm(context.Proximity) < 500;
+                if (result)
+                    return true;
+            }
+
+            return false;
+        }
 
     }
 }
