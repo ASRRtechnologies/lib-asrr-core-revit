@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Elements\Families\FamilyUtils.cs" />
+    <Compile Include="RevitModel\FamilyPlacer.cs" />
     <Compile Include="Utilities\Collector.cs" />
     <Compile Include="Utilities\FileUtilities.cs" />
     <Compile Include="Utilities\GeometryUtils.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Model\VectorRotation.cs" />
     <Compile Include="RevitModel\ModelFetcher.cs" />
     <Compile Include="RevitModel\ModelPlacer.cs" />
+    <Compile Include="Utilities\LogUtilities.cs" />
     <Compile Include="Utilities\UseDestinationHandler.cs" />
     <Compile Include="Model\IPosition.cs" />
     <Compile Include="Model\IRotation.cs" />
@@ -108,7 +110,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib-asrr-core\ASRR.Core.csproj">
+    <ProjectReference Include="..\core\ASRR.Core.csproj">
       <Project>{12EA4456-8CD5-43EF-80C7-D70338C8B018}</Project>
       <Name>ASRR.Core</Name>
     </ProjectReference>

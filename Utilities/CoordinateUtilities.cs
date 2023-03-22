@@ -5,6 +5,8 @@ namespace ASRR.Revit.Core.Utilities
 {
     public class CoordinateUtilities
     {
+        private const double epsilon = 0.00001f;
+
         public static XYZ ConvertMmToFeet(XYZ vector)
         {
             return new XYZ
@@ -89,6 +91,17 @@ namespace ASRR.Revit.Core.Utilities
             result += ToString(curve.GetEndPoint(1));
             result += Environment.NewLine;
             return result;
+        }
+
+        public static bool IsInsideBoundingBox(BoundingBoxXYZ boundingBox, XYZ point)
+        {
+            return
+                boundingBox.Min.X - epsilon <= point.X &&
+                boundingBox.Min.Y - epsilon <= point.Y &&
+                boundingBox.Min.Z - epsilon <= point.Z &&
+                boundingBox.Max.X + epsilon >= point.X &&
+                boundingBox.Max.Y + epsilon >= point.Y &&
+                boundingBox.Max.Z + epsilon >= point.Z;
         }
     }
 }
