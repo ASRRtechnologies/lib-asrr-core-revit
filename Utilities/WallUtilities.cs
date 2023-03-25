@@ -24,11 +24,11 @@ namespace ASRR.Revit.Core.Utilities
             if (family == null) return false;
 
             var wallType = wall.WallType;
-            Log.Info($"Walltype for element {wall.Name} is {wallType.Name}");
+            // Log.Info($"Walltype for element {wall.Name} is {wallType.Name}");
             var parameter = wall.get_Parameter(BuiltInParameter.WALL_STRUCTURAL_USAGE_PARAM);
             if (parameter == null) return false;
 
-            Log.Info($"Found parameter for element {wall.Name}: {parameter.AsValueString()}");
+            // Log.Info($"Found parameter for element {wall.Name}: {parameter.AsValueString()}");
             return parameter.AsValueString() == "Bearing";
         }
 
@@ -121,11 +121,11 @@ namespace ASRR.Revit.Core.Utilities
                         //Log.Info($"--------------- {face.Reference.ElementReferenceType} ---------------");
                         facesLst.Add(face);
                         faces++;
-                        faceInfo += "Face " + faces + " area: " + geomFace.Area.ToString() + "\n";
+                        // faceInfo += "Face " + faces + " area: " + geomFace.Area.ToString() + "\n";
                         totalArea += geomFace.Area;
                     }
-                    faceInfo += "Number of faces: " + faces + "\n";
-                    faceInfo += "Total area: " + totalArea.ToString() + "\n";
+                    // faceInfo += "Number of faces: " + faces + "\n";
+                    // faceInfo += "Total area: " + totalArea.ToString() + "\n";
                 }
             }
             //TaskDialog.Show("Revit", faceInfo);
@@ -148,7 +148,7 @@ namespace ASRR.Revit.Core.Utilities
                     !IsExterior(w.WallType))
                     return false;
 
-                if (context != null) Log.Info($"Prox: {CoordinateUtilities.ConvertFeetToMm(context.Proximity)}");
+                if (context != null) Log.Trace($"Prox: {CoordinateUtilities.ConvertFeetToMm(context.Proximity)}");
 
                 //TODO: deze 500 variabele vangen in settings
                 var result = context != null && CoordinateUtilities.ConvertFeetToMm(context.Proximity) < 500;
