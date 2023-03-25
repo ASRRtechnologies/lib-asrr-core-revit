@@ -20,7 +20,7 @@ namespace ASRR.Revit.Core.Utilities
 
             var utils = new RevitFamilyUtils();
 
-            var family = utils.GetFamilyFromInstance(wall, false);
+            var family = utils.GetFamilyFromInstance(wall, true);
             if (family == null) return false;
 
             var wallType = wall.WallType;
