@@ -159,5 +159,11 @@ namespace ASRR.Revit.Core.Utilities
             return false;
         }
 
+        public static XYZ GetNormalizedDirection(Wall wall)
+        {
+            var lc = wall.Location as LocationCurve;
+            var direction = (lc.Curve.GetEndPoint(0) - lc.Curve.GetEndPoint(1)).Normalize();
+            return direction;
+        }
     }
 }
