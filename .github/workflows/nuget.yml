@@ -55,7 +55,7 @@ jobs:
 
     - name: 'Build project'
       run: |
-        msbuild ${{ env.PROJECT_PATH }} /t:Clean,Build /p:platform="AnyCPU" /p:Configuration=Release /p:OutputPath=\bin
+        msbuild ${{ env.PROJECT_PATH }} /t:Clean,Build /p:platform="AnyCPU" /p:Configuration=Release /p:OutputPath=\bin\Release
 
     - name: 'Pack project'
       run:  nuget pack ${{ env.PROJECT_PATH }} -Properties Configuration=Release -Version ${{ steps.gitversion.outputs.majorMinorPatch }} -OutputDirectory ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
