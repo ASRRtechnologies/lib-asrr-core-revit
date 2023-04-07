@@ -1,0 +1,65 @@
+name: Deploy to internal NuGet repository
+
+on:
+  push:
+    branches: [ dev ]
+    tags:
+    - 'v*'
+
+  pull_request:
+    branches: [ dev ]
+
+env:
+  PROJECT_PATH: ASRR.Revit.Core.csproj
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}\Output
+  NUGET_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+
+jobs:
+  deploy:
+    name: Deploy NuGet package
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    # install and calculate the new version with GitVersion  
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.7
+      with:
+        versionSpec: '5.5.0'
+
+    - name: Determine Version
+      uses: gittools/actions/gitversion/execute@v0.9.7
+      with:
+        useConfigFile: true
+        configFilePath: GitVersion.yml
+      
+      id: gitversion # step id used as reference for output values
+    - name: Display GitVersion outputs
+      run: |
+        echo "MajorMinorPatch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+        echo "NuGetVersionV2: ${{ steps.gitversion.outputs.nuGetVersionV2 }}"   
+        echo "CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}"
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: 'Restore packages'
+      run: nuget restore ${{ env.PROJECT_PATH }}
+
+    - name: 'Build project'
+      run: |
+        msbuild ${{ env.PROJECT_PATH }} /t:Clean,Build /p:platform="AnyCPU" /p:Configuration=Release /p:OutputPath=\bin
+
+    - name: 'Pack project'
+      run:  nuget pack ${{ env.PROJECT_PATH }} -Properties Configuration=Release -Version ${{ steps.gitversion.outputs.majorMinorPatch }} -OutputDirectory ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+
+    - name: 'Prep package'
+      run: |
+        dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.NUGET_API_KEY }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ASRRtechnologies/index.json"
+
+    - name: 'Push package'
+      run: |
+        dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}\*.nupkg --api-key ${{ secrets.NUGET_API_KEY }}  --source "github"
