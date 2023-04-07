@@ -48,7 +48,7 @@ jobs:
 
     - name: 'Prep package'
       run: |
-        dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.NUGET_API_KEY }} --store-password-in-clear-text --name github ${{ NUGET_URL }}
+        dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.NUGET_API_KEY }} --store-password-in-clear-text --name github ${{ env.NUGET_URL }}
 
     - name: 'Restore packages'
       run: nuget restore ${{ env.PROJECT_PATH }}
