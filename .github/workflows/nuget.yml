@@ -46,6 +46,10 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v1.0.2
 
+    - name: 'Prep package'
+      run: |
+        dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.NUGET_API_KEY }} --store-password-in-clear-text --name github ${{ NUGET_URL }}
+
     - name: 'Restore packages'
       run: nuget restore ${{ env.PROJECT_PATH }}
 
@@ -55,10 +59,6 @@ jobs:
 
     - name: 'Pack project'
       run:  nuget pack ${{ env.PROJECT_PATH }} -Properties Configuration=Release -Version ${{ steps.gitversion.outputs.majorMinorPatch }} -OutputDirectory ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
-
-    - name: 'Prep package'
-      run: |
-        dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.NUGET_API_KEY }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/ASRRtechnologies/index.json"
 
     - name: 'Push package'
       run: |
