@@ -9,8 +9,6 @@ namespace ASRR.Revit.Core.Utilities
     public class RoomUtilities
     {
 
-
-
         public static bool RoomIntersects(Wall wall, bool mirrored, List<Room> rooms)
         {
             //deze checked alleen het midpoint van de wall op een room. Hier kan dus perongeluk een element staat bijv een wall waardoor de room niet gevonden wordt
