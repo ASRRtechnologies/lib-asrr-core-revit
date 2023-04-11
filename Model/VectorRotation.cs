@@ -1,15 +1,14 @@
-﻿using ASRR.Revit.Core.Model;
+﻿using System;
 using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
-using System;
 
-namespace Form.Revit.Common
+namespace ASRR.Revit.Core.Model
 {
     public class VectorRotation : IRotation
     {
-        public VectorRotation(XYZ rotationVector)
+        public VectorRotation(XYZ rotationVector = null)
         {
-            RotationVector = rotationVector;
+            RotationVector = rotationVector ?? new XYZ();
         }
 
         public XYZ RotationVector { get; set; }
