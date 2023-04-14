@@ -113,7 +113,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\core\ASRR.Core.csproj">
+    <ProjectReference Include="..\lib-asrr-core\ASRR.Core.csproj">
       <Project>{12EA4456-8CD5-43EF-80C7-D70338C8B018}</Project>
       <Name>ASRR.Core</Name>
     </ProjectReference>
