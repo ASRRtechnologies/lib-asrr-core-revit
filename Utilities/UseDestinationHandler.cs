@@ -8,5 +8,12 @@ namespace ASRR.Revit.Core
         {
             return DuplicateTypeAction.UseDestinationTypes;
         }
+
+        public static CopyPasteOptions UseDestinationOnDuplicateNameCopyPasteOptions()
+        {
+            var copyOptions = new CopyPasteOptions();
+            copyOptions.SetDuplicateTypeNamesHandler(new UseDestinationHandler());
+            return copyOptions;
+        }
     }
 }

@@ -48,7 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Elements\Families\FamilyUtils.cs" />
+    <Compile Include="Model\CopyPasteConfiguration.cs" />
     <Compile Include="RevitModel\FamilyPlacer.cs" />
+    <Compile Include="RevitModel\ModelElementCollector.cs" />
+    <Compile Include="RevitModel\ModelElementCopyPaster.cs" />
     <Compile Include="Utilities\Collector.cs" />
     <Compile Include="Utilities\FileUtilities.cs" />
     <Compile Include="Utilities\GeometryUtils.cs" />
