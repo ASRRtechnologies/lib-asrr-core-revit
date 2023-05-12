@@ -22,11 +22,15 @@ namespace ASRR.Revit.Core.Warnings
                 //FailureDefinitionId id = failure.GetFailureDefinitionId();
                 var failureSeverity = failuresAccessor.GetSeverity();
 
-                //Simply eat all warnings
-                if (failureSeverity != FailureSeverity.Warning) continue;
+                // Simply eat all warnings
+                 if (failureSeverity != FailureSeverity.Warning) continue;
 
                 _logger?.Warn($"'{failure.GetDescriptionText()}'");
                 failuresAccessor.DeleteWarning(failure);
+
+                failure.SetCurrentResolutionType(FailureResolutionType.DeleteElements);
+
+
             }
 
             return FailureProcessingResult.Continue;
