@@ -28,9 +28,7 @@ namespace ASRR.Revit.Core.Warnings
                 _logger?.Warn($"'{failure.GetDescriptionText()}'");
                 failuresAccessor.DeleteWarning(failure);
 
-                failure.SetCurrentResolutionType(FailureResolutionType.DeleteElements);
-
-
+                // failure.SetCurrentResolutionType(FailureResolutionType.DeleteElements);
             }
 
             return FailureProcessingResult.Continue;
