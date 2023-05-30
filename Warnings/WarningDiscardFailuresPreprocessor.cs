@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Linq;
+using Autodesk.Revit.DB;
 using NLog;
 
 namespace ASRR.Revit.Core.Warnings
@@ -26,6 +27,12 @@ namespace ASRR.Revit.Core.Warnings
                  if (failureSeverity != FailureSeverity.Warning) continue;
 
                 _logger?.Warn($"'{failure.GetDescriptionText()}'");
+
+                foreach (var elementId in failure.GetFailingElementIds())
+                {
+                    _logger?.Warn($"Failed: '{elementId}'");
+                }
+
                 failuresAccessor.DeleteWarning(failure);
 
                 // failure.SetCurrentResolutionType(FailureResolutionType.DeleteElements);

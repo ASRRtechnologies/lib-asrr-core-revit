@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using NLog;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace ASRR.Revit.Core.Exporter
 {
@@ -42,8 +43,9 @@ namespace ASRR.Revit.Core.Exporter
                 File.Delete(exportPath);
             }
 
-            System.IO.File.Move(
-                    exportPath.Replace(".png", "") + " - 3D View - {3D}.png",
+            var exportDir = new FileInfo(exportPath).DirectoryName;
+            var exportedPNG = Directory.GetFiles(exportDir).First();
+            File.Move(exportedPNG,
                     exportPath);
 
             Log.Info($"Exporting PNG to: {exportPath}");
