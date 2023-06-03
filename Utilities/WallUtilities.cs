@@ -20,15 +20,15 @@ namespace ASRR.Revit.Core.Utilities
 
             var utils = new RevitFamilyUtils();
 
-            var family = utils.GetFamilyFromInstance(wall, true);
-            if (family == null) return false;
+            // var family = utils.GetFamilyFromInstance(wall, true);
+            // if (family == null) return false;
 
             var wallType = wall.WallType;
             // Log.Info($"Walltype for element {wall.Name} is {wallType.Name}");
             var parameter = wall.get_Parameter(BuiltInParameter.WALL_STRUCTURAL_USAGE_PARAM);
             if (parameter == null) return false;
 
-            // Log.Info($"Found parameter for element {wall.Name}: {parameter.AsValueString()}");
+            Log.Info($"Found parameter for element {wall.Name}: {parameter.AsValueString()}");
             return parameter.AsValueString() == "Bearing";
         }
 
