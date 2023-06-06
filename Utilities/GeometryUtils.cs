@@ -1,7 +1,9 @@
-﻿using ASRR.Revit.Core.Utilities;
+﻿using ASRR.Core.Utilities;
+using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
 using System;
 using System.Collections.Generic;
+using System.Windows.Media.Animation;
 
 namespace ASRR.Revit.Core.Elements
 {
@@ -88,6 +90,12 @@ namespace ASRR.Revit.Core.Elements
             xyzQ33Feet.Add(new XYZ(0, 0, wallbase));
 
             return new List<XYZ> { xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet };
+        }
+
+        public static bool FaceNormalsAreParallel(XYZ faceNormal1, XYZ faceNormal2)
+        {
+            return MathUtilities.ApproximateEquals(faceNormal1.DotProduct(faceNormal2), 1) || 
+                MathUtilities.ApproximateEquals(faceNormal1.DotProduct(faceNormal2.Multiply(-1)), 1);
         }
     }
 }
