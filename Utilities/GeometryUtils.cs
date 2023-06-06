@@ -89,5 +89,10 @@ namespace ASRR.Revit.Core.Elements
 
             return new List<XYZ> { xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet };
         }
+
+        public static bool FaceNormalsAreParallel(XYZ normal1, XYZ normal2)
+        {
+            return IsAlmostEqual(normal1.DotProduct(normal2), 1) || IsAlmostEqual(normal1.DotProduct(normal2.Multiply(-1.0)), 1.0);
+        }
     }
 }
