@@ -39,14 +39,12 @@ namespace ASRR.Revit.Core.Exporter
             document.ExportImage(opt);
 
             if (File.Exists(exportPath))
-            {
                 File.Delete(exportPath);
-            }
 
             var exportDir = new FileInfo(exportPath).DirectoryName;
             var exportedPNG = Directory.GetFiles(exportDir).First();
             File.Move(exportedPNG,
-                    exportPath);
+                exportPath);
 
             Log.Info($"Exporting PNG to: {exportPath}");
         }
