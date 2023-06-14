@@ -20,11 +20,11 @@ namespace ASRR.Revit.Core.Utilities
 
             var utils = new RevitFamilyUtils();
 
-            // var family = utils.GetFamilyFromInstance(wall, true);
+            // var family = utils.GetFamilyFromInstance(element, true);
             // if (family == null) return false;
 
             var wallType = wall.WallType;
-            // Log.Info($"Walltype for element {wall.Name} is {wallType.Name}");
+            // Log.Info($"Walltype for element {element.Name} is {wallType.Name}");
             var parameter = wall.get_Parameter(BuiltInParameter.WALL_STRUCTURAL_USAGE_PARAM);
             if (parameter == null) return false;
 
@@ -35,27 +35,27 @@ namespace ASRR.Revit.Core.Utilities
         public static int WallLength(Wall wall)
         {
             var parameter = wall.get_Parameter(BuiltInParameter.CURVE_ELEM_LENGTH).AsValueString();
-            // Log.Info($"wall length is: {parameter}");
+            // Log.Info($"element length is: {parameter}");
             return Convert.ToInt32(parameter);
         }
 
         public static int WallHeight(Wall wall)
         {
             var parameter = wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).AsValueString();
-            // Log.Info($"wall height is: {parameter}");
+            // Log.Info($"element height is: {parameter}");
             return Convert.ToInt32(parameter);
         }
 
         public static string WallBaseConstraint(Wall wall)
         {
             var parameter = wall.get_Parameter(BuiltInParameter.WALL_BASE_CONSTRAINT).AsValueString();
-            Log.Debug($"wall base constraint is: {parameter}");
+            Log.Debug($"element base constraint is: {parameter}");
             return parameter;
         }
 
         public static Curve GetCurve(Wall wall)
         {
-            if (!(wall.Location is LocationCurve location)) throw new Exception("Could not cast wall to LocationCurve");
+            if (!(wall.Location is LocationCurve location)) throw new Exception("Could not cast element to LocationCurve");
             return location.Curve;
         }
 
@@ -78,7 +78,7 @@ namespace ASRR.Revit.Core.Utilities
         public static double GetNormalAxisProjection(Wall wall, double theta)
         {
             if (!(wall.Location is LocationCurve c))
-                throw new Exception("Could not cast wall to LocationCurve");
+                throw new Exception("Could not cast element to LocationCurve");
 
             var xyzFeet = c.Curve.GetEndPoint(0); // 0 and 1 will give same output due to projection on normal axis
             var xyz = CoordinateUtilities.ConvertFeetToMm(xyzFeet);
@@ -96,14 +96,14 @@ namespace ASRR.Revit.Core.Utilities
             return WallFunction.Exterior == f;
         }
 
-        public List<Face> GetAllWallFaces(Wall wall)
+        public List<Face> GetAllWallFaces(Element element)
         {
             List<Face> facesLst = new List<Face>();
             ReferenceArray refArray = new ReferenceArray();
-            string faceInfo = "";
+            // string faceInfo = "";
             Options opt = new Options();
             opt.ComputeReferences = true;
-            Autodesk.Revit.DB.GeometryElement geomElem = wall.get_Geometry(opt);
+            GeometryElement geomElem = element.get_Geometry(opt);
             foreach (GeometryObject geomObj in geomElem)
             {
                 Solid geomSolid = geomObj as Solid;
@@ -113,9 +113,6 @@ namespace ASRR.Revit.Core.Utilities
                     double totalArea = 0;
                     foreach (Face geomFace in geomSolid.Faces)
                     {
-                        
-
-
                         Face face = geomFace as Face;
                         refArray.Append(face.Reference);
                         //Log.Info($"--------------- {face.Reference.ElementReferenceType} ---------------");
@@ -124,11 +121,8 @@ namespace ASRR.Revit.Core.Utilities
                         // faceInfo += "Face " + faces + " area: " + geomFace.Area.ToString() + "\n";
                         totalArea += geomFace.Area;
                     }
-                    // faceInfo += "Number of faces: " + faces + "\n";
-                    // faceInfo += "Total area: " + totalArea.ToString() + "\n";
                 }
             }
-            //TaskDialog.Show("Revit", faceInfo);
             return facesLst;
         }
 
