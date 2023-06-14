@@ -48,10 +48,17 @@ namespace ASRR.Revit.Core.Utilities
                 UnitTypeId.Feet);
         }
 
-        public static double ConvertFeetToMm(double feetValue)
+        public static double ConvertFeetToMm(double feetValue, bool round = false)
         {
-            return UnitUtils.Convert(feetValue, UnitTypeId.Feet,
+           var output = UnitUtils.Convert(feetValue, UnitTypeId.Feet,
                 UnitTypeId.Millimeters);
+
+           if (round)
+           {
+               output = Math.Round(output * 100) / 100;
+           }
+
+           return output;
         }
 
         public static bool ApproximateEquals(XYZ position, XYZ otherPositionInMillimeters)
