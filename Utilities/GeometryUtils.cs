@@ -95,5 +95,15 @@ namespace ASRR.Revit.Core.Elements
         {
             return IsAlmostEqual(normal1.DotProduct(normal2), 1) || IsAlmostEqual(normal1.DotProduct(normal2.Multiply(-1.0)), 1.0);
         }
+
+        public static bool IsPerpendicular(XYZ orientation, XYZ minFaceNormal)
+        {
+            return IsAlmostEqual(orientation.DotProduct(minFaceNormal), 0);
+        }
+
+        public static double ProjectVectorOnPlane(XYZ plane, XYZ vector)
+        {
+            return plane.DotProduct(vector);
+        }
     }
 }
