@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -9,7 +10,7 @@ namespace ASRR.Revit.Core.Http
 {
     public class HttpService
     {
-        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly HttpClient _httpClient;
 
         public HttpService()
@@ -93,7 +94,16 @@ namespace ASRR.Revit.Core.Http
 
         private static T RunTask<T>(Task<T> task)
         {
-            task.Wait();
+            try
+            {
+                task.Wait();
+            }
+            catch (Exception ex)
+            {
+                var message = ex.InnerException?.Message ?? ex.Message;
+                _logger.Error($"Failed to make request. Exception: {message}");
+                return default;
+            }
             return task.IsCompleted ? task.Result : default;
         }
     }
