@@ -9,11 +9,16 @@ namespace ASRR.Revit.Core.UI.RibbonPanelItemCreator
     {
         private readonly ImageSource _imageSource;
         private readonly string _title;
+        private readonly string _description;
 
-        public PushButtonRibbonPanelItemCreator(string title, ImageSource imageSource)
+        public PushButtonRibbonPanelItemCreator(string title, ImageSource imageSource, string description = "")
         {
             _title = title;
             _imageSource = imageSource;
+            _description = title;
+            if (!string.IsNullOrEmpty(description))
+                _description = string.Format("{0}\n{1}", _title, description)
+                    .Trim();
         }
 
         public void Create(RibbonPanel panel)
