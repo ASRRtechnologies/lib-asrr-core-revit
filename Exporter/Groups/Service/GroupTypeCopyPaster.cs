@@ -182,7 +182,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
             {
                 ModelGroupType = copiedGroupType,
                 PositionOffset = groupTypeSet.PositionOffset,
-                AttachedDetailGroupTypes = attachedDetailGroupTypes
+                AttachedDetailGroupTypes = attachedDetailGroupTypes,
             };
 
             return copiedGroupTypeSet;
