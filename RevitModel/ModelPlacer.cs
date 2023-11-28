@@ -40,7 +40,7 @@ namespace ASRR.Revit.Core.RevitModel
                 var existingModelGroups = GetExistingModelGroups(modelElementsInSourceDoc, existingGroupTypes);
 
                 //Copy all models that don't conflict with existing grouptypes in the destination document
-                var copyPastableElementIds = modelElementsInSourceDoc.Except(existingModelGroups).Select(e => e.Id).ToList();
+                var copyPastableElementIds = modelElementsInSourceDoc.Except(existingModelGroups).Select(e => e.Id).Distinct().ToList();
                 if (copyPastableElementIds.Any())
                     pastedIds.AddRange(_copyPaster.CopyPasteModelElements(sourceDoc, doc, copyPastableElementIds));
 
