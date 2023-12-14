@@ -104,6 +104,7 @@ namespace ASRR.Revit.Core.RevitModel
 
                 foreach (var id in elementIds)
                 {
+                    if (id == null) continue;
                     var pastedElement = doc.GetElement(id);
 
                     //Rotate around the origin axis first so we don't mess up with the wrong origin point the new group has

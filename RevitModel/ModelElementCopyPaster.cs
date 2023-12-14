@@ -1,4 +1,5 @@
-﻿using ASRR.Revit.Core.Warnings;
+﻿using System;
+using ASRR.Revit.Core.Warnings;
 using Autodesk.Revit.DB;
 using NLog;
 using System.Collections.Generic;
@@ -58,7 +59,8 @@ namespace ASRR.Revit.Core.RevitModel
                 using (var transaction = WarningDiscardFailuresPreprocessor.GetTransaction(destinationDoc))
                 {
                     transaction.Start($"Copy paste modelelement with id {id.IntegerValue}");
-                    pastedIds.Add(CopyModelElement(sourceDoc, destinationDoc, id));
+                    var copiedId = CopyModelElement(sourceDoc, destinationDoc, id);
+                    if (copiedId != null) pastedIds.Add(copiedId);
                     transaction.Commit();
                 }
             }
@@ -72,10 +74,17 @@ namespace ASRR.Revit.Core.RevitModel
 
             _logger.Trace($"Copying modelElement '{sourceDoc.GetElement(modelElementId).Name}'");
 
-            var copiedId = ElementTransformUtils.CopyElements(sourceDoc, idAsList,
-                destinationDoc, Transform.Identity, copyOptions).First();
+            try
+            {
+                var copiedId = ElementTransformUtils.CopyElements(sourceDoc, idAsList,
+                    destinationDoc, Transform.Identity, copyOptions).First();
 
-            return copiedId;
+                return copiedId;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
 
         protected ICollection<ElementId> CopyModelElements(Document sourceDoc, Document destinationDoc, ICollection<ElementId> modelElementIds)
