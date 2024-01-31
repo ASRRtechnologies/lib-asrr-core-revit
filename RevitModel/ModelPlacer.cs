@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using ASRR.Revit.Core.Utilities;
 using NLog;
+using ASRR.Revit.Core.Exporter.Groups.Model;
+using ASRR.Revit.Core.Exporter.Groups.Service;
 
 namespace ASRR.Revit.Core.RevitModel
 {
@@ -14,10 +16,14 @@ namespace ASRR.Revit.Core.RevitModel
     {
         private readonly Logger _logger = LogManager.GetCurrentClassLogger();
         private readonly ModelElementCopyPaster _copyPaster;
+        private readonly GroupTypeCopyPaster _groupTypeCopyPaster;
+        private readonly GroupTypeSetCreator _groupTypeSetCreator;
 
         public ModelPlacer()
         {
             _copyPaster = new ModelElementCopyPaster();
+            _groupTypeSetCreator = new GroupTypeSetCreator();
+            _groupTypeCopyPaster = new GroupTypeCopyPaster();
         }
 
         public void Place(Document doc, string filePath, XYZ position, XYZ rotation, int levelId) // TODO: use levelId
@@ -38,19 +44,28 @@ namespace ASRR.Revit.Core.RevitModel
 
                 var pastedIds = new List<ElementId>();
                 var existingModelGroups = GetExistingModelGroups(modelElementsInSourceDoc, existingGroupTypes);
+                
+                foreach (var existingModelGroup in existingModelGroups)
+                {
+                    var group = existingModelGroup as Group;
+                    var groupTypeSet = _groupTypeSetCreator.Create(doc, group, false);
+                    var groupTypeSetAsList = new List<GroupTypeSet> { groupTypeSet };
+
+                    var copiedGroupTypeSet =
+                        _groupTypeCopyPaster.CopyGroupTypeSets(sourceDoc, doc, groupTypeSetAsList).First();
+                    _groupTypeCopyPaster.PlaceModelGroup(doc, copiedGroupTypeSet, new MillimeterPosition(position) );
+                    sourceDoc.Close(false);
+                }
 
                 //Copy all models that don't conflict with existing grouptypes in the destination document
-                var copyPastableElementIds = modelElementsInSourceDoc.Except(existingModelGroups).Select(e => e.Id).Distinct().ToList();
-                if (copyPastableElementIds.Any())
-                    pastedIds.AddRange(_copyPaster.CopyPasteModelElements(sourceDoc, doc, copyPastableElementIds));
-
-                //Separately copy-paste the modelgroups that have an existing grouptype in the destination document
-                pastedIds.AddRange(CopyPasteModelGroupsWithExistingGroupType(sourceDoc, doc, existingModelGroups.Select(e => e as Group).ToList(), existingGroupTypes));
-
-                TransformElements(doc, pastedIds, new MillimeterPosition(position), new VectorRotation(rotation));
-
-                _logger.Trace($"Copy-pasted file to position {CoordinateUtilities.WriteXyz(position)} and rotation {CoordinateUtilities.WriteXyz(rotation)}");
-                sourceDoc.Close(false);
+                // var copyPastableElementIds = modelElementsInSourceDoc.Except(existingModelGroups).Select(e => e.Id).Distinct().ToList();
+                // if (copyPastableElementIds.Any())
+                //     pastedIds.AddRange(_copyPaster.CopyPasteModelElements(sourceDoc, doc, copyPastableElementIds));
+                //
+                // //Separately copy-paste the modelgroups that have an existing grouptype in the destination document
+                // pastedIds.AddRange(CopyPasteModelGroupsWithExistingGroupType(sourceDoc, doc, existingModelGroups.Select(e => e as Group).ToList(), existingGroupTypes));
+                //
+                // TransformElements(doc, pastedIds, new MillimeterPosition(position), new VectorRotation(rotation));
             }
         }
 

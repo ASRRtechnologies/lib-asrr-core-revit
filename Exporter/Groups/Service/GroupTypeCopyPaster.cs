@@ -66,6 +66,8 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
                 TransformUtilities.Move(modelGroup, position);
 
+                _logger.Info(groupTypeSet.AttachedDetailGroupTypes.Count + "group has .. attached detailgroup types");
+
                 if (groupTypeSet.AttachedDetailGroupTypes.Count > 0)
                     EnableAttachedDetailGroupsInFloorPlans(doc, modelGroup, groupTypeSet.AttachedDetailGroupTypes);
 
