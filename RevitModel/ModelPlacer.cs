@@ -37,15 +37,14 @@ namespace ASRR.Revit.Core.RevitModel
             _logger.Info($"Collecting contents of '{filePath}' in file");
             using (var sourceDoc = doc.Application.OpenDocumentFile(filePath))
             {
-                var existingGroupTypes = Collector.GetAllOfType<GroupType>(doc).ToList();
+                // var existingGroupTypes = Collector.GetAllOfType<GroupType>(doc).ToList();
 
                 var modelElementsInSourceDoc = GetModelElementsInSourceDoc(sourceDoc);
                 if (modelElementsInSourceDoc == null) return;
 
-                var pastedIds = new List<ElementId>();
-                var existingModelGroups = GetExistingModelGroups(modelElementsInSourceDoc, existingGroupTypes);
+                // var existingModelGroups = GetExistingModelGroups(modelElementsInSourceDoc, existingGroupTypes);
                 
-                foreach (var existingModelGroup in existingModelGroups)
+                foreach (var existingModelGroup in modelElementsInSourceDoc)
                 {
                     var group = existingModelGroup as Group;
                     var groupTypeSet = _groupTypeSetCreator.Create(doc, group, false);
