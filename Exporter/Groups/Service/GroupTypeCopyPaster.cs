@@ -43,7 +43,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
         }
 
         //Create an instance of the modelgrouptype and enable the detailgroups in the appropriate views
-        public Group PlaceModelGroup(Document doc, GroupTypeSet groupTypeSet, IPosition position,
+        public Group PlaceModelGroup(Document doc, GroupTypeSet groupTypeSet, Group group, IPosition position,
             IRotation rotation = null)
         {
             if (doc == null || groupTypeSet?.ModelGroupType == null)
@@ -60,6 +60,60 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
                 modelGroup = doc.Create.PlaceGroup(groupTypeSet.PositionOffset.PositionInFeet,
                     groupTypeSet.ModelGroupType);
+
+                Dictionary<string, object> parameterSet = new Dictionary<string, object>();
+
+                // Get the parameters from the element
+                foreach (Parameter parameter in group.Parameters)
+                {
+                    // Get the parameter name
+                    string paramName = parameter.Definition.Name;
+
+                    if (parameterSet.ContainsKey(paramName))
+                    {
+                        _logger.Warn("Parameter with name {0} already exists in the parameter set", paramName);
+                        continue;
+                    }
+
+                    if (!parameter.HasValue)
+                    {
+                        _logger.Warn("Parameter with name {0} does not have a value", paramName);
+                        continue; // Skip the parameter and log a warning to the _logger.
+                    }
+
+                    // Get the parameter value
+                    object paramValue = null;
+
+                    // Check the storage type of the parameter to retrieve the appropriate value
+                    switch (parameter.StorageType)
+                    {
+                        case StorageType.Double:
+                            paramValue = parameter.AsDouble();
+                            break;
+                        case StorageType.Integer:
+                            paramValue = parameter.AsInteger();
+                            break;
+                        case StorageType.String:
+                            var stringValue = parameter.AsString();
+                            if (stringValue == null || stringValue.Trim().Length == 0)
+                                continue;
+                            paramValue = stringValue;
+                            break;
+                        // Add additional cases for other storage types as needed
+
+                        default:
+                            continue;
+                            // Handle other storage types if necessary
+                            break;
+                    }
+
+                    _logger.Info("Parameter name: {0}, Parameter value: {1}", paramName, paramValue);
+
+                    // Add the parameter name and value to the dictionary
+                    parameterSet.Add(paramName, paramValue);
+                }
+
+                Elements.Parameters.ParameterUtils.Apply(modelGroup, parameterSet);
 
                 if (rotation != null)
                     TransformUtilities.RotateGlobal(modelGroup, rotation);

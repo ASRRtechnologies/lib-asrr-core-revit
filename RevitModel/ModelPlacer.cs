@@ -53,7 +53,7 @@ namespace ASRR.Revit.Core.RevitModel
 
                     var copiedGroupTypeSet =
                         _groupTypeCopyPaster.CopyGroupTypeSets(sourceDoc, doc, groupTypeSetAsList).First();
-                    _groupTypeCopyPaster.PlaceModelGroup(doc, copiedGroupTypeSet, new MillimeterPosition(position) );
+                    _groupTypeCopyPaster.PlaceModelGroup(doc, copiedGroupTypeSet, group, new MillimeterPosition(position) );
                     sourceDoc.Close(false);
                 }
 

@@ -32,7 +32,7 @@ namespace ASRR.Revit.Core.Elements.Parameters
                 if (parameter == null)
                 {
                     Log.Warn($"Parameter '{key}' not found");
-                    return false;
+                    continue;
                 }
 
                 switch (value)
