@@ -75,6 +75,12 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
                         continue;
                     }
 
+                    if (paramName == "Origin Level Offset")
+                    {
+                        _logger.Info("Parameter with name {0} is the origin level offset, skipping...", paramName);
+                        continue;
+                    }
+
                     if (!parameter.HasValue)
                     {
                         _logger.Warn("Parameter with name {0} does not have a value", paramName);
