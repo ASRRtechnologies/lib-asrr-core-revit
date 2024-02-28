@@ -189,6 +189,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
             else
             {
                 var copiedGroupTypeSet = CopyGroupTypeSet(sourceDoc, destinationDoc, groupTypeSet);
+                _logger.Info("Copied group type set: " + copiedGroupTypeSet);
                 if (copiedGroupTypeSet == null) return false;
 
                 copiedGroupTypeSets.Add(copiedGroupTypeSet);

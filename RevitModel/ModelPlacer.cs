@@ -44,14 +44,16 @@ namespace ASRR.Revit.Core.RevitModel
 
                 // var existingModelGroups = GetExistingModelGroups(modelElementsInSourceDoc, existingGroupTypes);
                 
-                foreach (var existingModelGroup in modelElementsInSourceDoc)
+                foreach (var sourceModelGroup in modelElementsInSourceDoc)
                 {
-                    var group = existingModelGroup as Group;
-                    var groupTypeSet = _groupTypeSetCreator.Create(doc, group, false);
+                    var group = sourceModelGroup as Group;
+                    var groupTypeSet = _groupTypeSetCreator.Create(sourceDoc, group, false);
                     var groupTypeSetAsList = new List<GroupTypeSet> { groupTypeSet };
 
                     var copiedGroupTypeSet =
                         _groupTypeCopyPaster.CopyGroupTypeSets(sourceDoc, doc, groupTypeSetAsList).First();
+                   
+                        _logger.Info($"Copied grouptypeset has {copiedGroupTypeSet.AttachedDetailGroupTypes.Count} atached deetail groups");
                     _groupTypeCopyPaster.PlaceModelGroup(doc, copiedGroupTypeSet, group, new MillimeterPosition(position) );
                     sourceDoc.Close(false);
                 }
