@@ -1,7 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ASRR.Revit.Core.Exporter.GLTF.Export;
+using ASRR.Revit.Core.Exporter.GLTF.Model;
+using ASRR.Revit.Core.Exporter.GLTF.Transform;
+using ASRR.Revit.Core.Exporter.GLTF.Utils;
 using Autodesk.Revit.DB;
+using Common_glTF_Exporter.Utils;
 using Settings = ASRR.Revit.Core.Exporter.GLTF.Model.Settings;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Core
@@ -150,7 +155,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Core
             rootNode.name = "rootNode";
             rootNode.rotation = ModelRotation.Get(preferences.flipAxis);
             rootNode.scale = ModelScale.Get(preferences);
-            rootNode.translation = ModelTraslation.GetPointToRelocate(doc, rootNode.scale[0], 
+            rootNode.translation = ModelTranslation.GetPointToRelocate(doc, rootNode.scale[0], 
                 preferences, isRFA);
             rootNode.children = new List<int>();
 
@@ -181,8 +186,6 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Core
 
             FileExport.Run(preferences, bufferViews, buffers, binaryFileData,
                 scenes, nodes, meshes, materials, accessors);
-
-            Compression.Run(preferences, ProgressBarWindow.ViewModel);
         }
 
         /// <summary>
@@ -215,7 +218,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Core
                 if (!element.IsHidden(view) && 
                     view.IsElementVisibleInTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate, elementId))
                 {
-                    ProgressBarWindow.ViewModel.ProgressBarValue++;
+                    // ProgressBarWindow.ViewModel.ProgressBarValue++;
                 }
             }
 

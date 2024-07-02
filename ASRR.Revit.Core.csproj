@@ -112,6 +112,9 @@
     <Compile Include="Exporter\GLTF\Model\Settings.cs" />
     <Compile Include="Exporter\GLTF\Model\UnitObject.cs" />
     <Compile Include="Exporter\GLTF\Model\VertexLookupIntObject.cs" />
+    <Compile Include="Exporter\GLTF\Transform\ModelRotation.cs" />
+    <Compile Include="Exporter\GLTF\Transform\ModelScale.cs" />
+    <Compile Include="Exporter\GLTF\Transform\ModelTranslation.cs" />
     <Compile Include="Exporter\GLTF\Utils\Collectors.cs" />
     <Compile Include="Exporter\GLTF\Utils\DirectoryUtils.cs" />
     <Compile Include="Exporter\GLTF\Utils\GeometryUtils.cs" />
@@ -191,5 +194,6 @@
       <Name>ASRR.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

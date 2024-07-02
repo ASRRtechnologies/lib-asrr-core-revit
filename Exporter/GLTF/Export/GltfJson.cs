@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ASRR.Revit.Core.Exporter.GLTF.Core;
+using ASRR.Revit.Core.Exporter.GLTF.Model;
 using Newtonsoft.Json;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Export

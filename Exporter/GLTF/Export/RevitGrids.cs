@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using ASRR.Revit.Core.Exporter.GLTF.Core;
+using ASRR.Revit.Core.Exporter.GLTF.Model;
+using ASRR.Revit.Core.Exporter.GLTF.Utils;
 using Autodesk.Revit.DB;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Export

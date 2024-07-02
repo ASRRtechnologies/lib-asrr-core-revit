@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ASRR.Revit.Core.Exporter.GLTF.Model;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Core
 {

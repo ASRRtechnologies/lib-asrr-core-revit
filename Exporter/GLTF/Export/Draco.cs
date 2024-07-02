@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using ASRR.Revit.Core.Exporter.GLTF.Model;
+using dracowrapper;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Export
 {
