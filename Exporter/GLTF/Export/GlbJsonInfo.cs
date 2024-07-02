@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using ASRR.Revit.Core.Exporter.GLTF.Model;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Export
 {
