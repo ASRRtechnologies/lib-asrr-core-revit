@@ -1,8 +1,9 @@
-﻿namespace Common_glTF_Exporter.Utils
+﻿using System.Configuration;
+using System.IO;
+using System.Reflection;
+
+namespace ASRR.Revit.Core.Exporter.GLTF.Utils
 {
-    using System.Configuration;
-    using System.IO;
-    using System.Reflection;
     using Configuration = System.Configuration.Configuration;
 
     public static class SettingsConfig
