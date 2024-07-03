@@ -319,6 +319,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
                     try
                     {
                         modelGroup.ShowAttachedDetailGroups(floorPlan, detailGroupType.GroupType.Id);
+                        
                     }
                     catch (Exception e)
                     {
