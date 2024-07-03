@@ -21,7 +21,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
         public bool materials { get; set; } = true;
 
         public FormatEnum format { get; set; } = FormatEnum.glb;
-
+        
         public bool normals { get; set; } = true;
 
         public bool levels { get; set; } = true;
