@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
+using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitHub;
 using Nuke.Common.Tools.GitVersion;
@@ -22,7 +24,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     image: GitHubActionsImage.WindowsLatest,
     AutoGenerate = true,
     FetchDepth = 0,
-    OnPushBranches = ["main", "dev", "release/**"],
+    OnPushBranches = ["dev", "release/**"],
     OnPullRequestBranches = ["release/**"],
     InvokedTargets = [ nameof(Pack) ],
     EnableGitHubToken = true,
@@ -64,12 +66,14 @@ class Build : NukeBuild
         .Before(Clean)
         .Executes(() =>
         {
-            Log.Information("GitVersion = {Value}", GitVersion.MajorMinorPatch ?? "Not available");
+            Log.Information("GitVersion = {Value}", GitVersion?.MajorMinorPatch ?? "Not available");
             Log.Information("Current Config = {Value}", Configuration.ToString());
             Log.Information("GitHub NuGet feed = {Value}", GitHubNuGetFeed);
             Log.Information("GitVer = {Value}", GitVersion);
             Log.Information("NuGet feed = {Value}", NuGetFeed);
             Log.Information("GitHub Repo = {Value}", GitRepository);
+            Log.Information("Artifacts = {Value}", ArtifactsDirectory);
+            Log.Information("GitHub Actions = {Value}", GitHubActions);
         });
 
     Target Clean => _ => _
@@ -113,10 +117,10 @@ class Build : NukeBuild
                 .SetOutputDirectory(ArtifactsDirectory)
                 .EnableNoBuild()
                 .EnableNoRestore()
-                .SetVersion(GitVersion.MajorMinorPatch)
-                .SetAssemblyVersion(GitVersion.AssemblySemVer)
-                .SetInformationalVersion(GitVersion.InformationalVersion)
-                .SetFileVersion(GitVersion.AssemblySemFileVer)
+                .SetVersion(GitVersion?.MajorMinorPatch)
+                .SetAssemblyVersion(GitVersion?.AssemblySemVer)
+                .SetInformationalVersion(GitVersion?.InformationalVersion)
+                .SetFileVersion(GitVersion?.AssemblySemFileVer)
             );
         });
     
@@ -124,7 +128,12 @@ class Build : NukeBuild
         .Description($"Publish to Github for Development builds.")
         .Triggers(CreateRelease)
         .Requires(() => Configuration.Equals(Configuration.Release))
-        .OnlyWhenStatic(() => GitRepository.IsOnDevelopBranch() || GitHubActions.IsPullRequest)
+        .OnlyWhenStatic(() =>
+        {
+            var isOnDevelopBranch = GitRepository?.IsOnDevelopBranch() ?? false;
+            var isPullRequest = GitHubActions?.IsPullRequest ?? false;
+            return isOnDevelopBranch || isPullRequest;
+        })
         .Executes(() =>
         {
             ArtifactsDirectory.GlobFiles(ArtifactsType)
@@ -144,7 +153,7 @@ class Build : NukeBuild
         .Description($"Publishing to NuGet with the version.")
         .Triggers(CreateRelease)
         .Requires(() => Configuration.Equals(Configuration.Release))
-        .OnlyWhenStatic(() => GitRepository.IsOnMainOrMasterBranch())
+        .OnlyWhenStatic(() => GitRepository.IsOnDevelopBranch())
         .Executes(() =>
         {
             Log.Information($"Pushing package to NuGet feed...");
@@ -164,7 +173,7 @@ class Build : NukeBuild
     Target CreateRelease => _ => _
         .Description($"Creating release for the publishable version.")
         .Requires(() => Configuration.Equals(Configuration.Release))
-        .OnlyWhenStatic(() => GitRepository.IsOnMainOrMasterBranch() || GitRepository.IsOnReleaseBranch())
+        .OnlyWhenStatic(() => GitRepository.IsOnDevelopBranch() || GitRepository.IsOnReleaseBranch())
         .Executes(async () =>
         {
             var credentials = new Credentials(GitHubActions.Token);
