@@ -1,11 +1,6 @@
 ﻿using ASRR.Revit.Core.Elements.Families;
 using Autodesk.Revit.DB;
-using System;
 using NLog;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel.Channels;
-using Autodesk.Revit.ApplicationServices;
 using ASRR.Revit.Core.Elements;
 
 namespace ASRR.Revit.Core.Utilities

@@ -1,8 +1,6 @@
 ﻿
 using Autodesk.Revit.DB;
 using NLog;
-using System;
-using System.Collections.Generic;
 
 namespace ASRR.Revit.Core.Elements.Parameters.Dto
 {
@@ -52,21 +50,15 @@ namespace ASRR.Revit.Core.Elements.Parameters.Dto
         }
         private static dynamic _getParameterValueByCorrectStorageType(Parameter parameter)
         {
-            switch (parameter.StorageType)
+            return parameter.StorageType switch
             {
-                case StorageType.ElementId:
-                    return parameter.AsElementId().IntegerValue;
-                case StorageType.Integer:
-                    return parameter.AsInteger();
-                case StorageType.None:
-                    return parameter.AsString();
-                case StorageType.Double:
-                    return parameter.AsDouble();
-                case StorageType.String:
-                    return parameter.AsValueString();
-                default:
-                    return "";
-            }
+                StorageType.ElementId => parameter.AsElementId().IntegerValue,
+                StorageType.Integer => parameter.AsInteger(),
+                StorageType.None => parameter.AsString(),
+                StorageType.Double => parameter.AsDouble(),
+                StorageType.String => parameter.AsValueString(),
+                _ => ""
+            };
         }
 
 
@@ -105,37 +97,15 @@ namespace ASRR.Revit.Core.Elements.Parameters.Dto
         }
         private static dynamic _setParameterValueByCorrectStorageType(Parameter parameter, dynamic parameterValue)
         {
-            switch (parameter.StorageType)
+            return parameter.StorageType switch
             {
-                case StorageType.Double:
-                    return parameter.Set(Convert.ToDouble(parameterValue));
-                case StorageType.Integer:
-                    return parameter.Set(Convert.ToInt32(Convert.ToDouble(parameterValue)));
-                case StorageType.String:
-                    return parameter.Set(Convert.ToString(parameterValue));
-                case StorageType.None:
-                    return parameter.Set(Convert.ToString(parameterValue));
-                case StorageType.ElementId:
-                    return parameter.Set(parameterValue);
-                default:
-                    return "";
-            }
+                StorageType.Double => parameter.Set(Convert.ToDouble(parameterValue)),
+                StorageType.Integer => parameter.Set(Convert.ToInt32(Convert.ToDouble(parameterValue))),
+                StorageType.String => parameter.Set(Convert.ToString(parameterValue)),
+                StorageType.None => parameter.Set(Convert.ToString(parameterValue)),
+                StorageType.ElementId => parameter.Set(parameterValue),
+                _ => ""
+            };
         }
-        // private static string _familyParamValueString(FamilyType t, FamilyParameter fp)
-        // {
-        //     string value = t.AsValueString(fp);
-        //
-        //     switch (fp.StorageType)
-        //     {
-        //         case StorageType.Double:
-        //             value = Util.RealString((double)t.AsDouble(fp)) + " (double)";
-        //             break;
-        //         case StorageType.String:
-        //             value = "'" + t.AsString(fp) + "' (string)";
-        //             break;
-        //     }
-        //
-        //     return value;
-        // }
     }
 }

@@ -1,16 +1,15 @@
 ﻿using System.Configuration;
-using System.IO;
 using System.Reflection;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Utils
 {
-    using Configuration = System.Configuration.Configuration;
+    using Configuration = Configuration;
 
     public static class SettingsConfig
     {
         private static readonly string BinaryLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private static string appSettingsName = string.Concat(Assembly.GetExecutingAssembly().GetName().Name, ".dll.config");
-        private static string appSettingsFile = System.IO.Path.Combine(BinaryLocation, appSettingsName);
+        private static string appSettingsFile = Path.Combine(BinaryLocation, appSettingsName);
 
         public static string GetValue(string key)
         {

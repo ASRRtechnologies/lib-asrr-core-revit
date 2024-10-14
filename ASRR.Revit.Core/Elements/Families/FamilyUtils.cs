@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using System;
 
 namespace ASRR.Revit.Core.Elements.Families
 {
