@@ -1,6 +1,7 @@
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
 using Nuke.Common;
@@ -9,7 +10,6 @@ using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitHub;
 using Nuke.Common.Tools.GitVersion;
@@ -30,7 +30,7 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     EnableGitHubToken = true,
     ImportSecrets = [nameof(NuGetApiKey)]
 )]
-class Build : NukeBuild
+sealed partial class Build : NukeBuild
 {
     /// Support plugins are available for:
     ///   - JetBrains ReSharper        https://nuke.build/resharper
@@ -40,12 +40,6 @@ class Build : NukeBuild
 
     public static int Main () => Execute<Build>(x => x.Pack);
 
-    [Nuke.Common.Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-    [Nuke.Common.Parameter] string NuGetFeed = "https://api.nuget.org/v3/index.json";
-    [Nuke.Common.Parameter("NuGet API Key"), Secret] string NuGetApiKey;
-    [Nuke.Common.Parameter("Artifacts Type")] readonly string ArtifactsType;
-    [Nuke.Common.Parameter("Excluded Artifacts Type")] readonly string ExcludedArtifactsType;
     [Nuke.Common.Parameter("Copyright Details")] readonly string Copyright;
     
     [Solution(GenerateProjects = true)] readonly Solution Solution;
@@ -53,7 +47,6 @@ class Build : NukeBuild
     [GitVersion(NoFetch = true)] readonly GitVersion GitVersion;
     
     static GitHubActions GitHubActions => GitHubActions.Instance;
-    static AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
 
     const string PackageContentType = "application/octet-stream";
     static string ChangeLogFile => RootDirectory / "CHANGELOG.md";
@@ -62,18 +55,20 @@ class Build : NukeBuild
         ? $"https://nuget.pkg.github.com/{GitHubActions.RepositoryOwner}/index.json"
         : null;
 
+    string[] Configurations;
+    
     Target Print => _ => _
         .Before(Clean)
         .Executes(() =>
         {
             Log.Information("GitVersion = {Value}", GitVersion?.MajorMinorPatch ?? "Not available");
-            Log.Information("Current Config = {Value}", Configuration.ToString());
             Log.Information("GitHub NuGet feed = {Value}", GitHubNuGetFeed);
             Log.Information("GitVer = {Value}", GitVersion);
             Log.Information("NuGet feed = {Value}", NuGetFeed);
             Log.Information("GitHub Repo = {Value}", GitRepository);
             Log.Information("Artifacts = {Value}", ArtifactsDirectory);
             Log.Information("GitHub Actions = {Value}", GitHubActions);
+            Log.Information("GlobConfigs = {Value}", GlobBuildConfigurations());
         });
 
     Target Clean => _ => _
@@ -99,35 +94,26 @@ class Build : NukeBuild
             DotNetBuild(s => s
                 .SetProjectFile(Solution.ASRR_Revit_Core)
                 .SetFramework("net8.0")
-                .SetConfiguration(Configuration)
                 .EnableNoRestore()
             );
         });
-
-    Target Pack => _ => _
-        .Requires(() => Configuration.Equals(Configuration.Release))
-        .Produces(ArtifactsDirectory / ArtifactsType)
-        .DependsOn(Compile)
-        .Triggers(PublishToGithub, PublishToNuGet)
-        .Executes(() =>
-        {
-            DotNetPack(s => s
-                .SetProject(Solution.ASRR_Revit_Core)
-                .SetConfiguration(Configuration)
-                .SetOutputDirectory(ArtifactsDirectory)
-                .EnableNoBuild()
-                .EnableNoRestore()
-                .SetVersion(GitVersion?.MajorMinorPatch)
-                .SetAssemblyVersion(GitVersion?.AssemblySemVer)
-                .SetInformationalVersion(GitVersion?.InformationalVersion)
-                .SetFileVersion(GitVersion?.AssemblySemFileVer)
-            );
-        });
+    
+    List<string> GlobBuildConfigurations()
+    {
+        var configurations = Solution.Configurations
+            .Select(pair => pair.Key)
+            .Select(config => config.Remove(config.LastIndexOf('|')))
+            .Where(config => Configurations.Any(wildcard => FileSystemName.MatchesSimpleExpression(wildcard, config)))
+            .ToList();
+        
+        Assert.NotEmpty(configurations,
+            $"No solution configurations have been found. Pattern: {string.Join(" | ", Configurations)}");
+        return configurations;
+    }
     
     Target PublishToGithub => _ => _
         .Description($"Publish to Github for Development builds.")
         .Triggers(CreateRelease)
-        .Requires(() => Configuration.Equals(Configuration.Release))
         .OnlyWhenStatic(() =>
         {
             var isOnDevelopBranch = GitRepository?.IsOnDevelopBranch() ?? false;
@@ -148,31 +134,9 @@ class Build : NukeBuild
                     );
                 });
         });
-
-    Target PublishToNuGet => _ => _
-        .Description($"Publishing to NuGet with the version.")
-        .Triggers(CreateRelease)
-        .Requires(() => Configuration.Equals(Configuration.Release))
-        .OnlyWhenStatic(() => GitRepository.IsOnDevelopBranch())
-        .Executes(() =>
-        {
-            Log.Information($"Pushing package to NuGet feed...");
-            ArtifactsDirectory.GlobFiles(ArtifactsType)
-                .Where(x => !x.ToString().EndsWith(ExcludedArtifactsType))
-                .ForEach(x =>
-                {
-                    DotNetNuGetPush(s => s
-                        .SetTargetPath(x)
-                        .SetSource(NuGetFeed)
-                        .SetApiKey(NuGetApiKey)
-                        .EnableSkipDuplicate()
-                    );
-                });
-        });
     
     Target CreateRelease => _ => _
         .Description($"Creating release for the publishable version.")
-        .Requires(() => Configuration.Equals(Configuration.Release))
         .OnlyWhenStatic(() => GitRepository.IsOnDevelopBranch() || GitRepository.IsOnReleaseBranch())
         .Executes(async () =>
         {
@@ -211,7 +175,6 @@ class Build : NukeBuild
                 .Release
                 .Edit(owner, name, createdRelease.Id, new ReleaseUpdate { Draft = false });
         });
-
 
     private static async Task UploadReleaseAssetToGithub(Release release, string asset)
     {

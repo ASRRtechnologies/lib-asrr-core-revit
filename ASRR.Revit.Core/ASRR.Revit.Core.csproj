@@ -4,18 +4,40 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Configurations>Debug R25</Configurations>
+        <Configurations>$(Configurations);Release R25</Configurations>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <Authors>ASRR</Authors>
+        <Description>A collection of useful functions when dealing with the Revit API</Description>
+        <PackageTags>revit;library;utils</PackageTags>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/ASRRtechnologies/lib-asrr-revit-core</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/ASRRtechnologies/lib-asrr-revit-core</PackageProjectUrl>
+        <PackageIcon>images\PackageIcon.png</PackageIcon>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ASRR.Core" Version="1.0.5" />
-      <PackageReference Include="Draco_transcoder" Version="3.5.0" />
-      <PackageReference Include="MeshOptimizer_glTFPack" Version="2.0.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <PackageReference Include="NLog" Version="5.3.4" />
-      <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2025.0.0" />
-      <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0-rc.2.24473.5" />
+        <PackageReference Include="ASRR.Core" Version="1.0.5" />
+        <PackageReference Include="Draco_transcoder" Version="3.5.0" />
+        <PackageReference Include="MeshOptimizer_glTFPack" Version="2.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="NLog" Version="5.3.4" />
+        <PackageReference Include="Revit_All_Main_Versions_API_x64" Version="2025.0.0" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="..\.nuget\PackageIcon.png" PackagePath="images\" Pack="true"/>
+        <None Include="..\LICENSE.md" PackagePath="" Pack="true"/>
+        <None Include="..\README.md" PackagePath="" Pack="true"/>
+        <Content Include="**\*" Exclude="**\bin\**\*;**\obj\**\*"/>
+        <Compile Remove="**\*"/>
+    </ItemGroup>
+    
     <ItemGroup>
         <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
     </ItemGroup>
