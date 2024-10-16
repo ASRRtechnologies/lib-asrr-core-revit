@@ -122,7 +122,6 @@ sealed partial class Build : NukeBuild
     }
     
     Target PublishToGitHub => _ => _
-        .DependsOn(Pack)
         .Requires(() => GitHubToken)
         .Requires(() => GitRepository)
         .OnlyWhenStatic(() => IsServerBuild && (GitRepository.IsOnDevelopBranch() || GitRepository.IsOnReleaseBranch()))

@@ -12,7 +12,7 @@ sealed partial class Build
         .Produces(ArtifactsDirectory / ArtifactsType)
         .DependsOn(Compile)
         .Triggers(PublishToGitHub, PublishToNuGet)
-        .OnlyWhenStatic(() => IsLocalBuild || GitRepository.IsOnDevelopBranch())
+        .OnlyWhenStatic(() => IsLocalBuild || GitRepository.IsOnDevelopBranch() || GitRepository.IsOnReleaseBranch())
         .Executes(() =>
         {
             var readme = CreateNugetReadme();
