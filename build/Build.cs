@@ -58,6 +58,7 @@ sealed partial class Build : NukeBuild
         : null;
 
     string[] Configurations;
+    [Secret] [Nuke.Common.Parameter] string GitHubToken;
     
     Target Print => _ => _
         .Before(Clean)
@@ -122,14 +123,14 @@ sealed partial class Build : NukeBuild
     
     Target PublishToGitHub => _ => _
         .DependsOn(Pack)
-        .Requires(() => GitHubActions.Token)
+        .Requires(() => GitHubToken)
         .Requires(() => GitRepository)
         .OnlyWhenStatic(() => IsServerBuild && (GitRepository.IsOnDevelopBranch() || GitRepository.IsOnReleaseBranch()))
         .Executes(async () =>
         {
             GitHubTasks.GitHubClient = new GitHubClient(new ProductHeaderValue(Solution.Name))
             {
-                Credentials = new Credentials(GitHubActions.Token)
+                Credentials = new Credentials(GitHubToken)
             };
 
             var gitHubName = GitRepository.GetGitHubName();
