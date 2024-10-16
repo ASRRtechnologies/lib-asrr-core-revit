@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Nuke.Common;
 using Nuke.Common.ChangeLog;
@@ -11,6 +12,7 @@ using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitHub;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
@@ -69,6 +71,11 @@ sealed partial class Build : NukeBuild
             Log.Information("Artifacts = {Value}", ArtifactsDirectory);
             Log.Information("GitHub Actions = {Value}", GitHubActions);
             Log.Information("GlobConfigs = {Value}", GlobBuildConfigurations());
+
+            var c = BuildChangelog();
+            Log.Information(c.ToString());
+            WriteCompareUrl(c);
+            Log.Information(c.ToString());
         });
 
     Target Clean => _ => _
@@ -113,82 +120,129 @@ sealed partial class Build : NukeBuild
         return configurations;
     }
     
-    Target PublishToGithub => _ => _
-        .Description($"Publish to Github for Development builds.")
-        .Triggers(CreateRelease)
-        .OnlyWhenStatic(() =>
-        {
-            var isOnDevelopBranch = GitRepository?.IsOnDevelopBranch() ?? false;
-            var isOnReleaseBranch = GitRepository?.IsOnReleaseBranch() ?? false;
-            var isPullRequest = GitHubActions?.IsPullRequest ?? false;
-            return isOnReleaseBranch || isOnDevelopBranch || isPullRequest;
-        })
-        .Executes(() =>
-        {
-            ArtifactsDirectory.GlobFiles(ArtifactsType)
-                .Where(x => !x.ToString().EndsWith(ExcludedArtifactsType))
-                .ForEach(x =>
-                {
-                    DotNetNuGetPush(s => s
-                        .SetTargetPath(x)
-                        .SetSource(GitHubNuGetFeed)
-                        .SetApiKey(GitHubActions.Token)
-                        .EnableSkipDuplicate()
-                    );
-                });
-        });
-    
-    Target CreateRelease => _ => _
-        .Description($"Creating release for the publishable version.")
-        .OnlyWhenStatic(() => GitRepository.IsOnDevelopBranch() || GitRepository.IsOnReleaseBranch())
+    Target PublishToGitHub => _ => _
+        .DependsOn(Pack)
+        .Requires(() => GitHubActions.Token)
+        .Requires(() => GitRepository)
+        .OnlyWhenStatic(() => IsServerBuild && (GitRepository.IsOnDevelopBranch() || GitRepository.IsOnReleaseBranch()))
         .Executes(async () =>
         {
-            var credentials = new Credentials(GitHubActions.Token);
-            GitHubTasks.GitHubClient = new GitHubClient(new ProductHeaderValue(nameof(NukeBuild)),
-                new InMemoryCredentialStore(credentials));
-
-            var (owner, name) = (GitRepository.GetGitHubOwner(), GitRepository.GetGitHubName());
-
-            var releaseTag = GitVersion.NuGetVersionV2;
-            var changeLogSectionEntries = ChangelogTasks.ExtractChangelogSectionNotes(ChangeLogFile);
-            var latestChangeLog = changeLogSectionEntries
-                .Aggregate((c, n) => c + Environment.NewLine + n);
-
-            var newRelease = new NewRelease(releaseTag)
+            GitHubTasks.GitHubClient = new GitHubClient(new ProductHeaderValue(Solution.Name))
             {
-                TargetCommitish = GitVersion.Sha,
-                Draft = true,
-                Name = $"v{releaseTag}",
-                Prerelease = !string.IsNullOrEmpty(GitVersion.PreReleaseTag),
-                Body = latestChangeLog
+                Credentials = new Credentials(GitHubActions.Token)
             };
 
-            var createdRelease = await GitHubTasks
-                .GitHubClient
-                .Repository
-                .Release.Create(owner, name, newRelease);
+            var gitHubName = GitRepository.GetGitHubName();
+            var gitHubOwner = GitRepository.GetGitHubOwner();
 
-            ArtifactsDirectory.GlobFiles(ArtifactsType)
-                .Where(x => !x.ToString().EndsWith(ExcludedArtifactsType))
-                .ForEach(async x => await UploadReleaseAssetToGithub(createdRelease, x));
+            ValidateRelease();
 
-            await GitHubTasks
-                .GitHubClient
-                .Repository
-                .Release
-                .Edit(owner, name, createdRelease.Id, new ReleaseUpdate { Draft = false });
+            var artifacts = Directory.GetFiles(ArtifactsDirectory, "*");
+            var changelog = CreateGithubChangelog();
+            Assert.NotEmpty(artifacts, "No artifacts were found to create the Release");
+
+            var version = GitVersion.MajorMinorPatch;
+            var newRelease = new NewRelease(GitVersion.MajorMinorPatch)
+            {
+                Name = version,
+                Body = changelog,
+                TargetCommitish = GitRepository.Commit,
+                Prerelease = version.Contains("-beta") ||
+                             version.Contains("-dev") ||
+                             version.Contains("-preview")
+            };
+
+            var release = await GitHubTasks.GitHubClient.Repository.Release.Create(gitHubOwner, gitHubName, newRelease);
+            await UploadArtifactsAsync(release, artifacts);
         });
 
-    private static async Task UploadReleaseAssetToGithub(Release release, string asset)
+    static async Task UploadArtifactsAsync(Release createdRelease, IEnumerable<string> artifacts)
     {
-        await using var artifactStream = File.OpenRead(asset);
-        var fileName = Path.GetFileName(asset);
-        var assetUpload = new ReleaseAssetUpload
+        foreach (var file in artifacts)
         {
-            FileName = fileName,
-            ContentType = PackageContentType,
-            RawData = artifactStream,
-        };
-        await GitHubTasks.GitHubClient.Repository.Release.UploadAsset(release, assetUpload);
+            var releaseAssetUpload = new ReleaseAssetUpload
+            {
+                ContentType = "application/x-binary",
+                FileName = Path.GetFileName(file),
+                RawData = File.OpenRead(file)
+            };
+
+            await GitHubTasks.GitHubClient.Repository.Release.UploadAsset(createdRelease, releaseAssetUpload);
+            Log.Information("Artifact: {Path}", file);
+        }
+    }
+    
+    StringBuilder BuildChangelog()
+    {
+        const string separator = "# ";
+
+        var hasEntry = false;
+        var changelog = new StringBuilder();
+        foreach (var line in File.ReadLines(ChangeLogPath))
+        {
+            if (hasEntry)
+            {
+                if (line.StartsWith(separator)) break;
+
+                changelog.AppendLine(line);
+                continue;
+            }
+
+            if (line.StartsWith(separator) && line.Contains(GitVersion.MajorMinorPatch))
+            {
+                hasEntry = true;
+            }
+        }
+
+        TrimEmptyLines(changelog);
+        return changelog;
+    }
+
+    static void TrimEmptyLines(StringBuilder builder)
+    {
+        if (builder.Length == 0) return;
+
+        while (builder[^1] == '\r' || builder[^1] == '\n')
+        {
+            builder.Remove(builder.Length - 1, 1);
+        }
+
+        while (builder[0] == '\r' || builder[0] == '\n')
+        {
+            builder.Remove(0, 1);
+        }
+    }
+    
+    void WriteCompareUrl(StringBuilder changelog)
+    {
+        var tags = GitTasks.Git("describe --tags --abbrev=0 --always", logInvocation: false, logOutput: false);
+        var latestTag = tags.First().Text;
+        if (latestTag == GitRepository.Commit) return;
+
+        if (changelog[^1] != '\r' || changelog[^1] != '\n') changelog.AppendLine(Environment.NewLine);
+        changelog.Append("Full changelog: ");
+        changelog.Append(GitRepository.GetGitHubCompareTagsUrl(GitVersion.MajorMinorPatch, latestTag));
+    }
+    
+    void ValidateRelease()
+    {
+        var tags = GitTasks.Git("describe --tags --abbrev=0 --always", logInvocation: false, logOutput: false);
+        var latestTag = tags.First().Text;
+        if (latestTag == GitRepository.Commit) return;
+
+        Assert.False(latestTag == GitVersion.MajorMinorPatch, $"A Release with the specified tag already exists in the repository: {GitVersion.MajorMinorPatch}");
+        Log.Information("Version: {Version}", GitVersion.MajorMinorPatch);
+    }
+    
+    string CreateGithubChangelog()
+    {
+        Assert.True(File.Exists(ChangeLogPath), $"Unable to locate the changelog file: {ChangeLogPath}");
+        Log.Information("Changelog: {Path}", ChangeLogPath);
+
+        var changelog = BuildChangelog();
+        Assert.True(changelog.Length > 0, $"No version entry exists in the changelog: {GitVersion.MajorMinorPatch}");
+
+        WriteCompareUrl(changelog);
+        return changelog.ToString();
     }
 }

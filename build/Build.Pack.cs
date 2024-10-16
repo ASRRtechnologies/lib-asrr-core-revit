@@ -11,7 +11,7 @@ sealed partial class Build
     Target Pack => _ => _
         .Produces(ArtifactsDirectory / ArtifactsType)
         .DependsOn(Compile)
-        .Triggers(PublishToGithub, PublishToNuGet)
+        .Triggers(PublishToGitHub, PublishToNuGet)
         .OnlyWhenStatic(() => IsLocalBuild || GitRepository.IsOnDevelopBranch())
         .Executes(() =>
         {

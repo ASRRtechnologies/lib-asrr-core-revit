@@ -86,10 +86,9 @@
             "enum": [
               "Clean",
               "Compile",
-              "CreateRelease",
               "Pack",
               "Print",
-              "PublishToGithub",
+              "PublishToGitHub",
               "PublishToNuGet",
               "Restore"
             ]
@@ -107,10 +106,9 @@
             "enum": [
               "Clean",
               "Compile",
-              "CreateRelease",
               "Pack",
               "Print",
-              "PublishToGithub",
+              "PublishToGitHub",
               "PublishToNuGet",
               "Restore"
             ]

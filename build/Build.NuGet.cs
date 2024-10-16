@@ -14,9 +14,8 @@ sealed partial class Build
     
     Target PublishToNuGet => _ => _
         .Description($"Publishing to NuGet with the version.")
-        .Triggers(CreateRelease)
         .Requires(() => NuGetApiKey)
-        .OnlyWhenStatic(() => IsLocalBuild && GitRepository.IsOnDevelopBranch())
+        .OnlyWhenStatic(() => (IsServerBuild || IsLocalBuild) && GitRepository.IsOnDevelopBranch())
         .Executes(() =>
         {
             Log.Information($"Pushing package to NuGet feed...");
