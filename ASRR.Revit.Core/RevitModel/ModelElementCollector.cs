@@ -72,7 +72,7 @@ namespace ASRR.Revit.Core.RevitModel
             //Get all the categories that are associated with geometry in the document
             var modelCategories = doc.Settings.Categories.Cast<Category>()
                 .Where(c => c.CategoryType == CategoryType.Model && c.CanAddSubcategory)
-                .Select(c => (BuiltInCategory)c.Id.IntegerValue);
+                .Select(c => (BuiltInCategory)c.Id.Value);
 
             modelCategories = modelCategories.Union(VitalCategories);
 

@@ -58,7 +58,7 @@ namespace ASRR.Revit.Core.RevitModel
             {
                 using (var transaction = WarningDiscardFailuresPreprocessor.GetTransaction(destinationDoc))
                 {
-                    transaction.Start($"Copy paste modelelement with id {id.IntegerValue}");
+                    transaction.Start($"Copy paste modelelement with id {id.Value}");
                     var copiedId = CopyModelElement(sourceDoc, destinationDoc, id);
                     if (copiedId != null) pastedIds.Add(copiedId);
                     transaction.Commit();

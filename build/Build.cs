@@ -91,11 +91,13 @@ sealed partial class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            DotNetBuild(s => s
-                .SetProjectFile(Solution.ASRR_Revit_Core)
-                .SetFramework("net8.0")
-                .EnableNoRestore()
-            );
+            foreach(var configuration in GlobBuildConfigurations())
+            {
+                DotNetBuild(s => s
+                    .SetConfiguration(configuration)
+                    .SetVerbosity(DotNetVerbosity.minimal)
+                );
+            }
         });
     
     List<string> GlobBuildConfigurations()
@@ -117,8 +119,9 @@ sealed partial class Build : NukeBuild
         .OnlyWhenStatic(() =>
         {
             var isOnDevelopBranch = GitRepository?.IsOnDevelopBranch() ?? false;
+            var isOnReleaseBranch = GitRepository?.IsOnReleaseBranch() ?? false;
             var isPullRequest = GitHubActions?.IsPullRequest ?? false;
-            return isOnDevelopBranch || isPullRequest;
+            return isOnReleaseBranch || isOnDevelopBranch || isPullRequest;
         })
         .Executes(() =>
         {

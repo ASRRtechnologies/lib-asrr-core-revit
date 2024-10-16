@@ -41,7 +41,7 @@ sealed partial class Build
         var logoEndIndex = readme.IndexOf(endSymbol, StringComparison.Ordinal);
         
         var nugetReadme = readme.Remove(logoStartIndex, logoEndIndex - logoStartIndex + endSymbol.Length);
-        File.WriteAllText(readmePath, readme);
+        File.WriteAllText(readmePath, nugetReadme);
 
         return readme;
     }

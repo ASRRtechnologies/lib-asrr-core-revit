@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.IO;
 using System.Reflection;
 
 namespace ASRR.Revit.Core.Exporter.GLTF.Utils

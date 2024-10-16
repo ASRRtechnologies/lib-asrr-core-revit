@@ -9,6 +9,8 @@
     <NukeScriptDirectory>..</NukeScriptDirectory>
     <NukeTelemetryVersion>1</NukeTelemetryVersion>
     <IsPackable>false</IsPackable>
+    <Configurations />
+    <Platforms />
   </PropertyGroup>
 
   <ItemGroup>

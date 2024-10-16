@@ -28,7 +28,11 @@ namespace ASRR.Revit.Core.UI.RibbonPanelItemCreator
             var commandName = commandType.FullName;
 
             var commandAssembly = Assembly.GetAssembly(commandType);
+            #if NET48_OR_GREATER
             var commandAssemblyName = commandAssembly.CodeBase;
+            #else
+            var commandAssemblyName = commandAssembly.Location;
+            #endif
             var uri = new UriBuilder(commandAssemblyName);
             var path = Uri.UnescapeDataString(uri.Path);
 

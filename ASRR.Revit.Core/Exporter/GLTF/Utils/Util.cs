@@ -193,7 +193,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Utils
             }
 
             ElementDescriptionStrBuilder.Append(LessSignStr);
-            ElementDescriptionStrBuilder.Append(e.Id.IntegerValue);
+            ElementDescriptionStrBuilder.Append(e.Id.Value);
             ElementDescriptionStrBuilder.Append(SpaceStr);
             ElementDescriptionStrBuilder.Append(e.Name);
             ElementDescriptionStrBuilder.Append(GreaterSignStr);
