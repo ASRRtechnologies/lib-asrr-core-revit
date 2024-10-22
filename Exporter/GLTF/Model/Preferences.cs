@@ -49,6 +49,7 @@ namespace ASRR.Revit.Core.Exporter.GLTF.Model
 
         public string path { get; set; }
 
+
         public string fileName { get; set; }
     }
 }

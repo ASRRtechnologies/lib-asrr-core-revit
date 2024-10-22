@@ -77,13 +77,13 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
                     if (paramName == "Origin Level Offset")
                     {
-                        _logger.Info("Parameter with name {0} is the origin level offset, skipping...", paramName);
+                       // _logger.Info("Parameter with name {0} is the origin level offset, skipping...", paramName);
                         continue;
                     }
 
                     if (!parameter.HasValue)
                     {
-                        _logger.Warn("Parameter with name {0} does not have a value", paramName);
+                       // _logger.Warn("Parameter with name {0} does not have a value", paramName);
                         continue; // Skip the parameter and log a warning to the _logger.
                     }
 
@@ -126,7 +126,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
 
                 TransformUtilities.Move(modelGroup, position);
 
-                _logger.Info(groupTypeSet.AttachedDetailGroupTypes.Count + "group has .. attached detailgroup types");
+                // _logger.Info(groupTypeSet.AttachedDetailGroupTypes.Count + "group has .. attached detailgroup types");
 
                 if (groupTypeSet.AttachedDetailGroupTypes.Count > 0)
                     EnableAttachedDetailGroupsInFloorPlans(doc, modelGroup, groupTypeSet.AttachedDetailGroupTypes);
@@ -189,7 +189,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
             else
             {
                 var copiedGroupTypeSet = CopyGroupTypeSet(sourceDoc, destinationDoc, groupTypeSet);
-                _logger.Info("Copied group type set: " + copiedGroupTypeSet);
+                // _logger.Info("Copied group type set: " + copiedGroupTypeSet);
                 if (copiedGroupTypeSet == null) return false;
 
                 copiedGroupTypeSets.Add(copiedGroupTypeSet);
@@ -318,8 +318,7 @@ namespace ASRR.Revit.Core.Exporter.Groups.Service
                 else
                     try
                     {
-                        modelGroup.ShowAttachedDetailGroups(floorPlan, detailGroupType.GroupType.Id);
-                        
+                        modelGroup.ShowAttachedDetailGroups(floorPlan, detailGroupType.GroupType.Id);                
                     }
                     catch (Exception e)
                     {

@@ -53,7 +53,7 @@ namespace ASRR.Revit.Core.RevitModel
                     var copiedGroupTypeSet =
                         _groupTypeCopyPaster.CopyGroupTypeSets(sourceDoc, doc, groupTypeSetAsList).First();
                    
-                        _logger.Info($"Copied grouptypeset has {copiedGroupTypeSet.AttachedDetailGroupTypes.Count} atached deetail groups");
+                        // _logger.Info($"Copied grouptypeset has {copiedGroupTypeSet.AttachedDetailGroupTypes.Count} atached deetail groups");
                     _groupTypeCopyPaster.PlaceModelGroup(doc, copiedGroupTypeSet, group, new MillimeterPosition(position) );
                     sourceDoc.Close(false);
                 }
@@ -158,14 +158,12 @@ namespace ASRR.Revit.Core.RevitModel
             if (modelElements.Any()) return modelElements;
             _logger.Error("File doesn't contain model elements");
             return null;
-
         }
 
         private List<Element> GetModelElements(Document doc)
         {
             var modelElements = ModelElementCollector.GetParentModelElements(doc).ToList();
-
-            _logger.Trace($"Found {modelElements.Count} modelgroups in source file");
+            //_logger.Trace($"Found {modelElements.Count} modelgroups in source file");
             return modelElements;
         }
     }

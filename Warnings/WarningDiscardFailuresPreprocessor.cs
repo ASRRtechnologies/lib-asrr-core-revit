@@ -26,11 +26,11 @@ namespace ASRR.Revit.Core.Warnings
                 // Simply eat all warnings
                  if (failureSeverity != FailureSeverity.Warning) continue;
 
-                _logger?.Warn($"'{failure.GetDescriptionText()}'");
+                _logger?.Warn($"Failure automatically processed, may result in missing elements: '{failure.GetDescriptionText()}'");
 
                 foreach (var elementId in failure.GetFailingElementIds())
                 {
-                    _logger?.Warn($"Failed: '{elementId}'");
+                    // _logger?.Warn($"Failed: '{elementId}'");
                 }
 
                 failuresAccessor.DeleteWarning(failure);
