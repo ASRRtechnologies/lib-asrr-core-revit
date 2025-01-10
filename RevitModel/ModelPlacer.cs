@@ -47,6 +47,11 @@ namespace ASRR.Revit.Core.RevitModel
                 foreach (var sourceModelGroup in modelElementsInSourceDoc)
                 {
                     var group = sourceModelGroup as Group;
+                    if (group == null)
+                    {
+                        _logger.Warn($"Found model element '{sourceModelGroup.Name}' is not of type Group. Skipping..");
+                        continue;
+                    }
                     var groupTypeSet = _groupTypeSetCreator.Create(sourceDoc, group, false);
                     var groupTypeSetAsList = new List<GroupTypeSet> { groupTypeSet };
 
