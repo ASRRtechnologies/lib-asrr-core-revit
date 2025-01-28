@@ -1,9 +1,7 @@
-﻿using ASRR.Core.Utilities;
+﻿using System;
+using System.Collections.Generic;
 using ASRR.Revit.Core.Utilities;
 using Autodesk.Revit.DB;
-using System;
-using System.Collections.Generic;
-using System.Windows.Media.Animation;
 
 namespace ASRR.Revit.Core.Elements
 {
@@ -73,7 +71,7 @@ namespace ASRR.Revit.Core.Elements
         {
             if (!(wall.Location is LocationCurve c))
                 throw new Exception("Could not cast wall to LocationCurve");
-            
+
             var xyzMidFeet = (c.Curve.GetEndPoint(0) + c.Curve.GetEndPoint(1)) / 2;
             var xyzQ1Feet = (c.Curve.GetEndPoint(0) + xyzMidFeet) / 2;
             var xyzQ3Feet = (xyzMidFeet + c.Curve.GetEndPoint(1)) / 2;
@@ -89,11 +87,13 @@ namespace ASRR.Revit.Core.Elements
             xyzQ11Feet.Add(new XYZ(0, 0, wallbase));
             xyzQ33Feet.Add(new XYZ(0, 0, wallbase));
 
-            return new List<XYZ> { xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet };
+            return new List<XYZ> {xyzQ1Feet, xyzMidFeet, xyzQ3Feet, xyzQ11Feet, xyzQ33Feet};
         }
+
         public static bool FaceNormalsAreParallel(XYZ normal1, XYZ normal2)
         {
-            return IsAlmostEqual(normal1.DotProduct(normal2), 1) || IsAlmostEqual(normal1.DotProduct(normal2.Multiply(-1.0)), 1.0);
+            return IsAlmostEqual(normal1.DotProduct(normal2), 1) ||
+                   IsAlmostEqual(normal1.DotProduct(normal2.Multiply(-1.0)), 1.0);
         }
 
         public static bool IsPerpendicular(XYZ orientation, XYZ minFaceNormal)

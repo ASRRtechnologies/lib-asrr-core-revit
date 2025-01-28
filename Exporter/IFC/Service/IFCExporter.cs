@@ -1,6 +1,7 @@
-using ASRR.Core.FileManagement;
+using ASRR.Core.FileManagement.Service;
 using ASRR.Revit.Core.Warnings;
 using Autodesk.Revit.DB;
+using BIM.IFC.Export.UI;
 
 namespace ASRR.Revit.Core.Exporter.IFC.Service
 {
@@ -14,7 +15,7 @@ namespace ASRR.Revit.Core.Exporter.IFC.Service
             ifcExportOptions.ExportBaseQuantities = true;
             ifcExportOptions.SpaceBoundaryLevel = 0;
             ifcExportOptions.AddOption("Name", "ASRR Technologies (ASRR B.V.)");
-            
+
             using (var transaction = WarningDiscardFailuresPreprocessor.GetTransaction(document))
             {
                 transaction.Start("Exporting IFC");
@@ -24,7 +25,7 @@ namespace ASRR.Revit.Core.Exporter.IFC.Service
         }
 
         public void Export(Document document, string exportFolder, string exportFileName,
-            BIM.IFC.Export.UI.IFCExportConfiguration ifcExportConfiguration, ElementId viewId = null)
+            IFCExportConfiguration ifcExportConfiguration, ElementId viewId = null)
         {
             FileValidator.EnsureFolderExists(exportFolder);
             var ifcExportOptions = new IFCExportOptions();
@@ -41,6 +42,7 @@ namespace ASRR.Revit.Core.Exporter.IFC.Service
                 if (viewId == null) ifcExportConfiguration.VisibleElementsOfCurrentView = false;
                 ifcExportConfiguration.UpdateOptions(ifcExportOptions, viewId);
             }
+
             using (var transaction = WarningDiscardFailuresPreprocessor.GetTransaction(document))
             {
                 transaction.Start("Exporting IFC");
