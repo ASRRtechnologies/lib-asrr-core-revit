@@ -36,7 +36,11 @@ namespace ASRR.Revit.Core.Exporter.IFC.Service
                 ifcExportOptions.FilterViewId = viewId;
                 ifcExportOptions.AddOption("Name", "ASRR Technologies (ASRR B.V.)");
             }
-            else ifcExportConfiguration.UpdateOptions(ifcExportOptions, viewId);
+            else
+            {
+                if (viewId == null) ifcExportConfiguration.VisibleElementsOfCurrentView = false;
+                ifcExportConfiguration.UpdateOptions(ifcExportOptions, viewId);
+            }
             using (var transaction = WarningDiscardFailuresPreprocessor.GetTransaction(document))
             {
                 transaction.Start("Exporting IFC");
