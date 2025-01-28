@@ -1,7 +1,7 @@
-using ASRR.Core.FileManagement.Service;
 using ASRR.Revit.Core.Warnings;
 using Autodesk.Revit.DB;
 using BIM.IFC.Export.UI;
+using System.IO;
 
 namespace ASRR.Revit.Core.Exporter.IFC.Service
 {
@@ -9,7 +9,7 @@ namespace ASRR.Revit.Core.Exporter.IFC.Service
     {
         public void Export(Document document, string exportFolder, string exportFileName)
         {
-            FileValidator.EnsureFolderExists(exportFolder);
+            Directory.CreateDirectory(exportFolder);
             var ifcExportOptions = new IFCExportOptions();
             ifcExportOptions.FileVersion = IFCVersion.IFC4;
             ifcExportOptions.ExportBaseQuantities = true;
@@ -27,7 +27,7 @@ namespace ASRR.Revit.Core.Exporter.IFC.Service
         public void Export(Document document, string exportFolder, string exportFileName,
             IFCExportConfiguration ifcExportConfiguration, ElementId viewId = null)
         {
-            FileValidator.EnsureFolderExists(exportFolder);
+            Directory.CreateDirectory(exportFolder);
             var ifcExportOptions = new IFCExportOptions();
             if (ifcExportConfiguration == null)
             {
